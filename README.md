@@ -140,15 +140,6 @@ You can improve multiplication performance even more by using precomputed double
 - We have [a special implementation which checks for Jacobi point validity without costly affine conversion.](./is_on_curve.go)
 - Golang's `big.Int` has some operations which are more costly than others. For example, doing `n.Exp(n, two, P)` is more costly than doing `n.Mul(n, n); mod(n)`. This holds for squaring and cubing, but exponents beyond 3 require `.Exp` for the best performance.
 
-## TODO
-
-- [ ] in EC math unit tests, check affine equality against vectors rather than jacobian equality.
-- [ ] get better more official test vectors
-- [ ] fulfill elliptic.Curve interface
-- [ ] add more examples
-- [ ] Subtract() func?
-- [ ] make separate package name for tests (ekliptic_test)
-
 ### Thanks!
 
 I wrote this library as a learning exercise. Thanks a ton to the following people and their amazing guides, with which I followed along and learned from.
