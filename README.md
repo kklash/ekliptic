@@ -1,4 +1,4 @@
-## Ekliptic
+# Ekliptic
 
 This package provides primitives for cryptographic operations on the secp256k1 curve, with zero dependencies and excellent performance. It provides both Affine and Jacobian interfaces for elliptic curve operations. Aims to facilitate performant low-level operations on secp256k1 without overengineering or kitchen-sink syndrome.
 
