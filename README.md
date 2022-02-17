@@ -108,7 +108,7 @@ Ax = x / z²
 Ay = y / z³
 ```
 
-This relationship means there are an absurdly large number of possible Jacobian coordinate triplets which describe the same affine point.
+This relationship means there are an absurdly large number of possible Jacobian coordinate triplets which describe the same affine point. Each affine coordinate is basically converted into a ratio of `x:z` and `y:z`, thus proportional ratios simplify to the same affine point.
 
 Why would we want to represent points this way? Elliptic curve multiplication - a critical primitive for almost any elliptic-curve cryptography - involves performing many addition operations in a row. That's what multiplication means, after all. When you add two affine `(x, y)` points together in an elliptic curve, you have to perform some finite field division, AKA modular inversion, to get a result back in affine form. Modular inversion is a very expensive operation compared to multiplication. Instead of dividing after _every_ addition operation, you can defer the division until the end of the multiplication sequence, by accumulating in the divisor coordinate `z`. After the multiplication operation is done, the point can be converted back to affine, or used for new EC operations, as needed.
 
