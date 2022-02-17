@@ -89,6 +89,15 @@ ekliptic.DoubleJacobi(
 
 While slightly more awkward to use, exposing this C-style API allows for better memory performance when doing large numbers of sequential operations. The garbage collector isn't doing as much work, because we don't have to keep re-allocating new `big.Int`s every time a call returns. We have some benchmarks for addition and doubling which demonstrate this method can save about 6 allocs/op, and a few hundred bytes of memory for every call involving Jacobian points.
 
+You can even safely pass the input pointers as the output pointers, to modify them in place.
+
+```go
+ekliptic.DoubleJacobi(
+  x3, y3, z3,
+  x3, y3, z3,
+)
+```
+
 `big.Int` structs can be re-used when the values they hold are no longer required. This is why you'll see patterns like this if you read Ekliptic's code:
 
 ```go

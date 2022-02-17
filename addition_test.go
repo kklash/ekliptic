@@ -33,6 +33,32 @@ Wanted:
 	}
 }
 
+func TestAddJacobi_MemSafety(t *testing.T) {
+	for i, vector := range test_vectors.JacobiAdditionVectors {
+		x1 := new(big.Int).Set(vector.X1)
+		y1 := new(big.Int).Set(vector.Y1)
+		z1 := new(big.Int).Set(vector.Z1)
+
+		AddJacobi(
+			x1, y1, z1,
+			vector.X2, vector.Y2, vector.Z2,
+			x1, y1, z1,
+		)
+
+		if !equal(x1, vector.X3) || !equal(y1, vector.Y3) || !equal(z1, vector.Z3) {
+			t.Errorf(`jacobi memory-safe point addition failed for vector %d - Got:
+	x3: %x
+	y3: %x
+	z3: %x
+Wanted:
+	x3: %x
+	y3: %x
+	z3: %x
+`, i, x1, y1, z1, vector.X3, vector.Y3, vector.Z3)
+		}
+	}
+}
+
 func TestAddAffine(t *testing.T) {
 	for i, vector := range test_vectors.JacobiAdditionVectors {
 		x1 := new(big.Int).Set(vector.X1)
@@ -61,6 +87,41 @@ Wanted:
 	x3: %x
 	y3: %x
 `, i, x3, y3, expectedX, expectedY)
+		}
+	}
+}
+
+func TestAddAffine_MemSafety(t *testing.T) {
+	// Test memory safety when result pointers are also input parameters.
+	for i, vector := range test_vectors.JacobiAdditionVectors {
+		x1 := new(big.Int).Set(vector.X1)
+		y1 := new(big.Int).Set(vector.Y1)
+		z1 := new(big.Int).Set(vector.Z1)
+		x2 := new(big.Int).Set(vector.X2)
+		y2 := new(big.Int).Set(vector.Y2)
+		z2 := new(big.Int).Set(vector.Z2)
+		expectedX := new(big.Int).Set(vector.X3)
+		expectedY := new(big.Int).Set(vector.Y3)
+		expectedZ := new(big.Int).Set(vector.Z3)
+
+		ToAffine(x1, y1, z1)
+		ToAffine(x2, y2, z2)
+		ToAffine(expectedX, expectedY, expectedZ)
+
+		AddAffine(
+			x1, y1,
+			x2, y2,
+			x1, y1,
+		)
+
+		if !EqualAffine(x1, y1, expectedX, expectedY) {
+			t.Errorf(`affine memory-safe point addition failed for vector %d - Got:
+	x3: %x
+	y3: %x
+Wanted:
+	x3: %x
+	y3: %x
+`, i, x1, y1, expectedX, expectedY)
 		}
 	}
 }

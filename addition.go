@@ -211,22 +211,38 @@ func AddAffine(
 	}
 
 	m := new(big.Int)
+	buf := new(big.Int)
 
 	if xEqual && yEqual {
 		// m = (3 * x1² + a) / (2 * y1)
 		m.Mul(x1, x1)
 		m.Mul(m, three)
-		twoY1Inverse := x3.Mul(y1, two)
+		twoY1Inverse := buf.Mul(y1, two)
 		invert(twoY1Inverse)
 		m.Mul(m, twoY1Inverse)
 	} else {
 		//  m = (y2 - y1) / (x2 - x1)
 		m.Sub(y2, y1)
-		xDiffInverse := x3.Sub(x2, x1)
+		xDiffInverse := buf.Sub(x2, x1)
 		invert(xDiffInverse)
 		m.Mul(m, xDiffInverse)
 	}
 	mod(m)
+
+	// Memory-safety: if result pointers are also input parameter pointers, we don't want to
+	// modify P1 and P2 until we're done using them.
+	if x1 == x3 {
+		x1 = new(big.Int).Set(x1)
+	}
+	if x2 == x3 {
+		x2 = new(big.Int).Set(x2)
+	}
+	if y1 == y3 {
+		y1 = new(big.Int).Set(y1)
+	}
+	if y2 == y3 {
+		y2 = new(big.Int).Set(y2)
+	}
 
 	// x3 = m² - x1 - x2
 	x3.Mul(m, m)

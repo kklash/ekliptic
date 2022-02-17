@@ -32,6 +32,31 @@ Wanted:
 	}
 }
 
+func TestDoubleJacobi_MemSafety(t *testing.T) {
+	for i, vector := range test_vectors.JacobiDoublingVectors {
+		x1 := new(big.Int).Set(vector.X1)
+		y1 := new(big.Int).Set(vector.Y1)
+		z1 := new(big.Int).Set(vector.Z1)
+
+		DoubleJacobi(
+			x1, y1, z1,
+			x1, y1, z1,
+		)
+
+		if !equal(x1, vector.X3) || !equal(y1, vector.Y3) || !equal(z1, vector.Z3) {
+			t.Errorf(`jacobi memory-safe point doubling failed for vector %d - Got:
+	x3: %x
+	y3: %x
+	z3: %x
+Wanted:
+	x3: %x
+	y3: %x
+	z3: %x
+`, i, x1, y1, z1, vector.X3, vector.Y3, vector.Z3)
+		}
+	}
+}
+
 func TestDoubleAffine(t *testing.T) {
 	for i, vector := range test_vectors.JacobiDoublingVectors {
 		x1 := new(big.Int).Set(vector.X1)
@@ -56,6 +81,32 @@ Wanted:
 	x3: %x
 	y3: %x
 `, i, x3, y3, expectedX, expectedY)
+		}
+	}
+}
+
+func TestDoubleAffine_MemSafety(t *testing.T) {
+	for i, vector := range test_vectors.JacobiDoublingVectors {
+		x1 := new(big.Int).Set(vector.X1)
+		y1 := new(big.Int).Set(vector.Y1)
+		z1 := new(big.Int).Set(vector.Z1)
+		expectedX := new(big.Int).Set(vector.X3)
+		expectedY := new(big.Int).Set(vector.Y3)
+		expectedZ := new(big.Int).Set(vector.Z3)
+
+		ToAffine(x1, y1, z1)
+		ToAffine(expectedX, expectedY, expectedZ)
+
+		DoubleAffine(x1, y1, x1, y1)
+
+		if !EqualAffine(x1, y1, expectedX, expectedY) {
+			t.Errorf(`affine memory-safe point doubling failed for vector %d - Got:
+	x3: %x
+	y3: %x
+Wanted:
+	x3: %x
+	y3: %x
+`, i, x1, y1, expectedX, expectedY)
 		}
 	}
 }

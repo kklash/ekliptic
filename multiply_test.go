@@ -34,6 +34,36 @@ Wanted:
 	}
 }
 
+func TestMultiplyJacobi_MemSafety(t *testing.T) {
+	x1 := new(big.Int)
+	y1 := new(big.Int)
+	z1 := new(big.Int)
+
+	for i, vector := range test_vectors.AffineMultiplicationVectors {
+		x1.Set(vector.X1)
+		y1.Set(vector.Y1)
+		z1.Set(one)
+
+		MultiplyJacobi(
+			x1, y1, z1,
+			vector.K,
+			x1, y1, z1,
+			nil,
+		)
+		ToAffine(x1, y1, z1)
+
+		if !equal(x1, vector.X2) || !equal(y1, vector.Y2) {
+			t.Errorf(`jacobi memory-safe multiplication failed for vector %d. Got:
+	x: %x
+	y: %x
+Wanted:
+	x: %x
+	y: %x
+`, i, x1, y1, vector.X2, vector.Y2)
+		}
+	}
+}
+
 func TestMultiplyAffine(t *testing.T) {
 	resultX := new(big.Int)
 	resultY := new(big.Int)
