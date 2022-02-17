@@ -121,6 +121,16 @@ This relationship means there are an absurdly large number of possible Jacobian 
 
 Why would we want to represent points this way? Elliptic curve multiplication - a critical primitive for almost any elliptic-curve cryptography - involves performing many addition operations in a row. That's what multiplication means, after all. When you add two affine `(x, y)` points together in an elliptic curve, you have to perform some finite field division, AKA modular inversion, to get a result back in affine form. Modular inversion is a very expensive operation compared to multiplication. Instead of dividing after _every_ addition operation, you can defer the division until the end of the multiplication sequence, by accumulating in the divisor coordinate `z`. After the multiplication operation is done, the point can be converted back to affine, or used for new EC operations, as needed.
 
+To demonstrate, notice how expensive a naive affine multiplication is compared to a Jacobian multiplication:
+
+```
+BenchmarkMultiplyJacobi-4                      600 ops     1926201 ns/op    639940 B/op     7261 allocs/op
+BenchmarkMultiplyAffine-4                      606 ops     1926115 ns/op    641480 B/op     7284 allocs/op
+BenchmarkMultiplyAffineNaive-4                 481 ops     2457812 ns/op    545873 B/op     9147 allocs/op
+```
+`ekliptic.MultiplyJacobi` and `ekliptic.MultiplyAffine` both use Jacobian math for multiplication operations under the hood. `ekliptic.MultiplyAffineNaive` is a naive implementation which uses affine addition and doubling instead of Jacobian math. It should be used for demonstrative purposes only.
+
+
 ### Precomputation
 
 You can improve multiplication performance even more by using precomputed doubles of the secp256k1 base-point. Precomputing `G * 2^i` for `i` in `[0..256]` significantly boosts performance for base-point [double-and-add multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Double-and-add), especially if [the precomputed doubles are saved in affine form](./precomputed_doubles.go). Values are computed using the `ekliptic.ComputePointDoubles` function, [triggered by `go generate`](./genprecompute).
