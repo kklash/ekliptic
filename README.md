@@ -154,3 +154,10 @@ Many [test vectors in this package](./test_vectors/) were either duplicated from
 
 - [`paulmillr/noble-secp256k1`](https://github.com/paulmillr/noble-secp256k1)
 - [`btcsuite/btcec`](https://github.com/btcsuite/btcd/tree/master/btcec) (note: they use a different algorithm to add jacobians, but it works out to the same affine coordinates at the end. I modified a few of their test fixtures' jacobian ratios.)
+
+
+## Donations
+
+If you're interested in supporting development of this package, show your love by dropping me some Bitcoins!
+
+### `bc1qhct3hwt5pjmu75d2fldwd477vhwmthuqvmh03s`
