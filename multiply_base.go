@@ -12,14 +12,10 @@ var basePointPrecomputations PrecomputedDoubles
 //
 // This function is used to derive the public key for a private key k, among other uses.
 func MultiplyBasePoint(k, x, y *big.Int) {
-	z := new(big.Int)
-
-	MultiplyJacobi(
-		Secp256k1_GeneratorX, Secp256k1_GeneratorY, one,
+	MultiplyAffine(
+		Secp256k1_GeneratorX, Secp256k1_GeneratorY,
 		k,
-		x, y, z,
+		x, y,
 		basePointPrecomputations,
 	)
-
-	ToAffine(x, y, z)
 }
