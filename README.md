@@ -1,10 +1,67 @@
 # Ekliptic
 
-This package provides primitives for cryptographic operations on the secp256k1 curve, with zero dependencies and excellent performance. It provides both Affine and Jacobian interfaces for elliptic curve operations. Aims to facilitate performant low-level operations on secp256k1 without overengineering or kitchen-sink syndrome.
+This package provides primitives for elliptic curve cryptographic operations on the secp256k1 curve, with zero dependencies and excellent performance. It provides both Affine and Jacobian interfaces for elliptic curve operations. Aims to facilitate performant low-level operations on secp256k1 without overengineering or kitchen-sink syndrome.
 
 ## ALPHA STATE
 
 This library is not finished, stable, or audited - depend on it at your own peril!
+
+## Elliptic-whah?
+
+Elliptic curve cryptography is a relatively new field of [asymmetric public-key cryptography](https://cryptobook.nakov.com/asymmetric-key-ciphers). An elliptic curve is just a cubic equation of a particular form. The secp256k1 curve, for example, is `y² = x³ + 7`. To make this curve equation useful, we first define an addition operation that 'adds' two `(x, y)` points on the curve to produce a third point _also_ on the curve. From that, you can create a multiplication operation to multiply a 2D point by some 1D (scalar) number, by simply adding the point to itself many times.
+
+It just so happens that due to the particular properties of elliptic curves, if you multiply some publicly known point by a secret number, that operation is extremely hard to reverse, and you end up with another point that is mathematically related to the secret number. Functions that are easy to compute but hard to reverse are a fundamental building block of cryptography, and people started to realize you could use this feature of elliptic curve equations as a basis for new public-key cryptosystems, like RSA, but using much smaller numbers in a 2D space.
+
+The unique one-way function of elliptic curve cryptography is _base point multiplication over a finite field,_ (the 'finite field' part means all coordinate values are taken modulo some large prime number). A base point is a publicly known `(x, y)` point, often called the _generator_ point `G`, which all parties agree upon. The private key in this cryptosystem is a scalar number `k` which is multiplied with the base point. The point resulting from base point multiplication `P` becomes the public key. `P` and `G` are capitalized to denote that they are 2D points, while `k` is a lone positive integer. Base point multiplication is written mathematically as
+
+```
+P = k * G
+```
+
+Point multiplication is _believed_ to be hard to undo: There's no way to quickly compute `k` if you only know `P` and `G`. The only known way to efficiently perform `P / G` would be to run Shor's Algorithm on a quantum computer that can operate with at least `6 * log2(k)` qubits. This currently doesn't exist, so at least for now, elliptic curve cryptography provides a safe way to sign/verify and encrypt/decrypt information asymetrically.
+
+
+## Down Sides
+
+Elliptic curve cryptography does have some down sides - Primarily, from the complexity involved in implementing it safely. To perform elliptic curve cryptography, _someone_ needs to design an elliptic curve with its various parameters in a secure way, which requires highly adept and experienced cryptographers. This makes users vulnerable to malicious design by those with the specialized knowledge needed to produce such curves. Compared to a simpler system like RSA, where there are no 'magic numbers' involved, ECC predicates the safety of the system not only on the security of the algorithms and in-code implementations, but also on the ethical integrity of curve designers, who are far fewer, and more tightly centralized.
+
+Thankfully, the secp256k1 curve was designed in a non-random 'nothing up my sleeve' fashion, which helps to reduce the risk that it was designed with a backdoor in mind. This is why it has become such a popular curve. Satoshi chose to use secp256k1 for Bitcoin for that same reason (among others).
+
+## Why not RSA?
+
+Primarily, for performance. Elliptic curves offer a way to perform cryptography faster for the same degree of security.
+
+A 256-bit elliptic curve key provides roughly the same degree of security as a 2048-bit RSA key. But for normal 'happy path' operations where you're not trying attack the cryptosystem, elliptic curve operations are _vastly_ faster, simply due to the size of the numbers involved. It's easier to multiply `5 x 9` than to multiply `555 x 999`.
+
+Consider this simple benchmark which compares 256-bit ECC and 2048-bit RSA private and public key generation:
+
+```go
+func BenchmarkGenerateKeys_Ekliptic(b *testing.B) {
+  var privateKey *big.Int
+  var publicKey struct{ x, y big.Int }
+  for i := 0; i < b.N; i++ {
+    privateKey, _ = ekliptic.NewPrivateKey(rand.Reader)
+    ekliptic.MultiplyBasePoint(privateKey, &publicKey.x, &publicKey.y)
+  }
+}
+
+func BenchmarkGenerateKeys_RSA(b *testing.B) {
+  for i := 0; i < b.N; i++ {
+    rsa.GenerateKey(rand.Reader, 2048)
+  }
+}
+```
+
+```
+goos: linux
+goarch: amd64
+pkg: t
+cpu: Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz
+BenchmarkGenerateKeys_Ekliptic-4        1530      711021 ns/op    242393 B/op     2833 allocs/op
+BenchmarkGenerateKeys_RSA-4                8   138256984 ns/op   1874108 B/op     5019 allocs/op
+```
+
+Golang's standard library `crypto/rsa` package takes between between 0.1 to 0.25 **seconds** to generate an RSA key pair of that size. Ekliptic takes less than a millisecond to generate an ECC key pair of equivalent security. For activities like web-browsing, ephemeral key pairs are constantly being generated to negotiate TLS-encrypted connections. The faster you can generate session keys and verify certificates, the faster you can open TLS connections, and the faster you can browse.
 
 ## Examples
 
