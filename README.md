@@ -160,7 +160,6 @@ ekliptic.DoubleJacobi(
 ```go
 e := a.Mul(a, three)
 a = nil
-mod(e)
 ```
 
 In the above example, `a` is no longer needed, so we reclaim its memory as a new variable to avoid allocating an entirely new `big.Int` struct for `e`.

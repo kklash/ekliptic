@@ -51,37 +51,29 @@ func AddJacobi(
 
 	// z1² and z2²
 	z1_pow2 := new(big.Int).Mul(z1, z1)
-	mod(z1_pow2)
 	z2_pow2 := new(big.Int).Mul(z2, z2)
-	mod(z2_pow2)
 
 	// u1 = x1 * z2²
 	u1 := new(big.Int).Mul(x1, z2_pow2)
-	mod(u1)
 
 	// u2 = x2 * z1²
 	u2 := new(big.Int).Mul(x2, z1_pow2)
-	mod(u2)
 
 	// z1³
 	z1_pow3 := z1_pow2.Mul(z1_pow2, z1)
 	z1_pow2 = nil
-	mod(z1_pow3)
 
 	// z2³
 	z2_pow3 := z2_pow2.Mul(z2_pow2, z2)
 	z2_pow2 = nil
-	mod(z2_pow3)
 
 	// s1 = y1 * z2³
 	s1 := z2_pow3.Mul(y1, z2_pow3)
 	z2_pow3 = nil
-	mod(s1)
 
 	// s2 = y2 * z1³
 	s2 := z1_pow3.Mul(y2, z1_pow3)
 	z1_pow3 = nil
-	mod(s2)
 
 	// h = u2 - u1
 	h := u2.Sub(u2, u1)
@@ -131,17 +123,14 @@ func AddJacobi(
 
 	// h²
 	hh := new(big.Int).Mul(h, h)
-	mod(hh)
 
 	// v = u1 * h²
 	v := u1.Mul(u1, hh)
 	u1 = nil
-	mod(v)
 
 	// h³
 	hhh := hh.Mul(hh, h)
 	hh = nil
-	mod(hhh)
 
 	// x3 = r² - h³ - 2*v
 	x3.Mul(r, r)

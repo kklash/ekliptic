@@ -20,33 +20,36 @@ func DoubleJacobi(
 ) {
 	// a = x1²
 	a := new(big.Int).Mul(x1, x1)
-	mod(a)
 
 	// b = y1²
 	b := new(big.Int).Mul(y1, y1)
-	mod(b)
 
 	// c = b²
 	c := new(big.Int).Mul(b, b)
-	mod(c)
 
-	// d = 2 * ((x1+b)² - a - c)
-	d := b.Add(b, x1)
+	// The official dbl-2009-l formula specifies:
+	//  d = 2 * ((x1+b)² - a - c)
+	//
+	// But it can be simplified, because:
+	//  a = x1², c = b²
+	//  d = 2 * ((x1+b)² - a - c)
+	//    = 2 * ((x1+b)² - x1² - b²)
+	//    = 2 * ((x1+b)(x1+b) - x1² - b²)
+	//    = 2 * (x1² + 2(x1*b) + b² - x1² - b²)
+	//    = 2 * 2(x1*b)
+	//
+	// So actually:
+	//  d = 4 * x1 * b
+	d := b.Mul(b, x1)
+	d.Mul(d, four)
 	b = nil
-	d.Mul(d, d)
-	d.Sub(d, a)
-	d.Sub(d, c)
-	d.Mul(d, two)
-	mod(d)
 
 	// e = 3 * a
 	e := a.Mul(a, three)
 	a = nil
-	mod(e)
 
 	// f = e²
 	f := new(big.Int).Mul(e, e)
-	mod(f)
 
 	// x3 = f - 2 * d
 	x3.Mul(d, two)
