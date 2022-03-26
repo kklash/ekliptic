@@ -180,9 +180,9 @@ Why would we want to represent points this way? Elliptic curve multiplication - 
 To demonstrate, notice how expensive a naive affine multiplication is compared to a Jacobian multiplication:
 
 ```
-BenchmarkMultiplyJacobi-4                      600 ops     1926201 ns/op    639940 B/op     7261 allocs/op
-BenchmarkMultiplyAffine-4                      606 ops     1926115 ns/op    641480 B/op     7284 allocs/op
-BenchmarkMultiplyAffineNaive-4                 481 ops     2457812 ns/op    545873 B/op     9147 allocs/op
+BenchmarkMultiplyJacobi-6                      675     1757329 ns/op    727070 B/op     5060 allocs/op
+BenchmarkMultiplyAffine-6                      679     1782691 ns/op    728819 B/op     5084 allocs/op
+BenchmarkMultiplyAffineNaive-6                 442     2480711 ns/op    545915 B/op     9147 allocs/op
 ```
 `ekliptic.MultiplyJacobi` and `ekliptic.MultiplyAffine` both use Jacobian math for multiplication operations under the hood. `ekliptic.MultiplyAffineNaive` is a naive implementation which uses affine addition and doubling instead of Jacobian math. It should be used for demonstrative purposes only.
 
