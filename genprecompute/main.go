@@ -1,4 +1,5 @@
-// genprecompute computes
+// genprecompute computes base-point doubles for the secp256k1 generator point,
+// and writes them as generated code to a given output file.
 package main
 
 import (
