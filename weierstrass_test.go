@@ -47,6 +47,14 @@ func TestWeierstrass_NotOnCurve(t *testing.T) {
 	}
 }
 
+func BenchmarkWeierstrass(b *testing.B) {
+	vector := test_vectors.NegatedPointVectors[0]
+
+	for i := 0; i < b.N; i++ {
+		Weierstrass(vector.X)
+	}
+}
+
 func ExampleWeierstrass() {
 	evenY, oddY := Weierstrass(big.NewInt(1))
 
