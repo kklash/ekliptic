@@ -63,7 +63,6 @@ func IsOnCurveJacobi(x, y, z *big.Int) bool {
 	// This is more efficient for larger powers than repeated .Mul() calls
 	z6b := new(big.Int).Exp(z, six, Secp256k1_P)
 	z6b.Mul(z6b, Secp256k1_B)
-	mod(z6b)
 
 	// x³ + z⁶b
 	right := new(big.Int).Mul(x, x)

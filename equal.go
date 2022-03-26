@@ -53,9 +53,7 @@ func EqualJacobi(
 
 	// z1² and z2²
 	z1_pow2 := new(big.Int).Mul(z1, z1)
-	mod(z1_pow2)
 	z2_pow2 := new(big.Int).Mul(z2, z2)
-	mod(z2_pow2)
 
 	// u1 = x1 * z2²
 	u1 := new(big.Int).Mul(x1, z2_pow2)
@@ -73,12 +71,10 @@ func EqualJacobi(
 	// z1³
 	z1_pow3 := z1_pow2.Mul(z1_pow2, z1)
 	z1_pow2 = nil
-	mod(z1_pow3)
 
 	// z2³
 	z2_pow3 := z2_pow2.Mul(z2_pow2, z2)
 	z2_pow2 = nil
-	mod(z2_pow3)
 
 	// s1 = y1 * z2³
 	s1 := z2_pow3.Mul(y1, z2_pow3)
