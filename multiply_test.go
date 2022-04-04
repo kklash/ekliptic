@@ -130,6 +130,26 @@ func BenchmarkMultiplyJacobi(b *testing.B) {
 	}
 }
 
+func BenchmarkMultiplyJacobi_Precomputed(b *testing.B) {
+	x := new(big.Int)
+	y := new(big.Int)
+	z := new(big.Int)
+
+	vector := test_vectors.AffineMultiplicationVectors[0]
+
+	precomputes := ComputePointDoubles(vector.X1, vector.Y1)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		MultiplyJacobi(
+			vector.X1, vector.Y1, one,
+			vector.K,
+			x, y, z,
+			precomputes,
+		)
+	}
+}
+
 func BenchmarkMultiplyAffine(b *testing.B) {
 	x := new(big.Int)
 	y := new(big.Int)
