@@ -6,6 +6,8 @@ This package provides primitives for elliptic curve cryptographic operations on 
 
 This library is not finished, stable, or audited - depend on it at your own peril!
 
+### [API Reference](https://pkg.go.dev/github.com/kklash/ekliptic)
+
 ## Elliptic-whah?
 
 Elliptic curve cryptography is a relatively new field of [asymmetric public-key cryptography](https://cryptobook.nakov.com/asymmetric-key-ciphers). An elliptic curve is just a cubic equation of a particular form. The secp256k1 curve, for example, is `y² = x³ + 7`. To make this curve equation useful, we first define an addition operation that 'adds' two `(x, y)` points on the curve to produce a third point _also_ on the curve. From that, you can create a multiplication operation to multiply a 2D point by some 1D (scalar) number, by simply adding the point to itself many times.
@@ -112,6 +114,39 @@ fmt.Printf("Bob's derived secret:   %x\n", bobSharedKey)
 // output:
 // Alice's derived secret: 375a5d26649704863562930ded2193a0569f90f4eb4e63f0fee72c4c05268feb
 // Bob's derived secret:   375a5d26649704863562930ded2193a0569f90f4eb4e63f0fee72c4c05268feb
+```
+
+Signing a message with ECDSA.
+
+```go
+import (
+  cryptorand "crypto/rand"
+  mathrand "math/rand"
+)
+
+randReader := mathrand.New(mathrand.NewSource(1))
+
+key, _ := cryptorand.Int(randReader, Secp256k1_CurveOrder)
+nonce, _ := cryptorand.Int(randReader, Secp256k1_CurveOrder)
+
+hashedMessage := sha256.Sum256([]byte("i love you"))
+hashedMessageInt := new(big.Int).SetBytes(hashedMessage[:])
+
+r := new(big.Int)
+s := new(big.Int)
+
+SignECDSA(
+  key, nonce, hashedMessageInt,
+  r, s,
+)
+
+fmt.Printf("r: %x\n", r)
+fmt.Printf("s: %x\n", s)
+
+// output:
+//
+// r: 4a821d5ec008712983929de448b8afb6c24e5a1b97367b9a65b6220d7f083fe3
+// s: 2e4f380e0ea1dfcb7cced430437c98b4570a06b3e929a3b19e6bbd53df2cf3f6
 ```
 
 ## Hacking on Ekliptic

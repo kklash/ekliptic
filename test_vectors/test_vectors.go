@@ -7,6 +7,7 @@ var (
 	JacobiPointVectors          []*JacobiPointVector
 	AffineMultiplicationVectors []*AffineMultiplicationVector
 	NegatedPointVectors         []*NegatedPointVector
+	ECDSAVectors                []*ECDSAVector
 )
 
 func init() {
@@ -33,6 +34,11 @@ func init() {
 	}
 
 	NegatedPointVectors, err = loadNegatedPointVectors()
+	if err != nil {
+		panic(err)
+	}
+
+	ECDSAVectors, err = loadECDSAVectors()
 	if err != nil {
 		panic(err)
 	}
