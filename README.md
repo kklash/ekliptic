@@ -158,6 +158,15 @@ fmt.Printf("s: %x\n", s)
 | `go test -bench=. -benchmem` | Run benchmarks with memory profile. |
 | `go generate` | Regenerate [precomputed base point doubles](./precomputed_doubles.go). |
 
+## Test Vectors
+
+Test vectors stored in [`test_vectors`](./test_vectors) can be verified using third-party libraries to double check that this library is working correctly.
+
+| Validates against | Command to run |
+|------------------|----------------|
+|[`paritytech/libsecp256k1`](https://github.com/paritytech/libsecp256k1) (Rust) |`cargo run --manifest-path ./test_vectors/validate_rs/{Cargo.toml,}`|
+
+
 ## Performance Optimizations
 
 ### Memory
