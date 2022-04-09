@@ -230,9 +230,6 @@ fn validate_jacobi_addition() {
         let expected_z3 = vector["z3"].as_str().unwrap();
 
         if actual_x3 != expected_x3 || actual_y3 != expected_y3 || actual_z3 != expected_z3 {
-            println!("{:?}", actual_x3);
-            println!("{:?}", actual_y3);
-            println!("{:?}", actual_z3);
             panic!(
                 "failed to add to expected jacobi point:\nx: {}\ny: {}\nz: {}\n  +\nx: {}\ny: {}\nz: {}",
                 vector["x1"].as_str().unwrap(),
