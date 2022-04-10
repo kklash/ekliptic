@@ -67,6 +67,8 @@ Golang's standard library `crypto/rsa` package takes between between 0.1 to 0.25
 
 ## Examples
 
+_Find fully validated examples in [`examples_test.go`](./examples_test.go)._
+
 Deriving a public key from a private key:
 
 ```go
@@ -89,24 +91,24 @@ fmt.Printf(" y: %x\n", y)
 Deriving a Diffie-Hellman shared-secret:
 
 ```go
-alice, _ := new(big.Int).SetString("94a22a406a6977c1a323f23b9d7678ad08e822834d1df8adece84e30f0c25b6b", 16)
-bob, _ := new(big.Int).SetString("55ba19100104cbd2842999826e99e478efe6883ac3f3a0c7571034321e0595cf", 16)
+alicePriv, _ := new(big.Int).SetString("94a22a406a6977c1a323f23b9d7678ad08e822834d1df8adece84e30f0c25b6b", 16)
+bobPriv, _ := new(big.Int).SetString("55ba19100104cbd2842999826e99e478efe6883ac3f3a0c7571034321e0595cf", 16)
 
 var alicePub, bobPub struct{ x, y big.Int }
 
 // derive public keys
-MultiplyBasePoint(alice, &alicePub.x, &alicePub.y)
-MultiplyBasePoint(bob, &bobPub.x, &bobPub.y)
+ekliptic.MultiplyBasePoint(alicePriv, &alicePub.x, &alicePub.y)
+ekliptic.MultiplyBasePoint(bobPriv, &bobPub.x, &bobPub.y)
 
 var yValueIsUnused big.Int
 
 // Alice gives Bob her public key, Bob derives the secret
 bobSharedKey := new(big.Int)
-MultiplyAffine(&alicePub.x, &alicePub.y, bob, bobSharedKey, &yValueIsUnused, nil)
+ekliptic.MultiplyAffine(&alicePub.x, &alicePub.y, bobPriv, bobSharedKey, &yValueIsUnused, nil)
 
 // Bob gives Alice his public key, Alice derives the secret
 aliceSharedKey := new(big.Int)
-MultiplyAffine(&bobPub.x, &bobPub.y, alice, aliceSharedKey, &yValueIsUnused, nil)
+ekliptic.MultiplyAffine(&bobPub.x, &bobPub.y, alicePriv, aliceSharedKey, &yValueIsUnused, nil)
 
 fmt.Printf("Alice's derived secret: %x\n", aliceSharedKey)
 fmt.Printf("Bob's derived secret:   %x\n", bobSharedKey)
@@ -122,12 +124,16 @@ Signing a message with ECDSA.
 import (
   cryptorand "crypto/rand"
   mathrand "math/rand"
+
+  "github.com/kklash/ekliptic"
 )
 
 randReader := mathrand.New(mathrand.NewSource(1))
 
-key, _ := cryptorand.Int(randReader, Secp256k1_CurveOrder)
-nonce, _ := cryptorand.Int(randReader, Secp256k1_CurveOrder)
+key, _ := ekliptic.NewPrivateKey(randReader)
+
+// This could also come from RFC6979 (github.com/kklash/rfc6979)
+nonce, _ := cryptorand.Int(randReader, ekliptic.Secp256k1_CurveOrder)
 
 hashedMessage := sha256.Sum256([]byte("i love you"))
 hashedMessageInt := new(big.Int).SetBytes(hashedMessage[:])
@@ -135,7 +141,7 @@ hashedMessageInt := new(big.Int).SetBytes(hashedMessage[:])
 r := new(big.Int)
 s := new(big.Int)
 
-SignECDSA(
+ekliptic.SignECDSA(
   key, nonce, hashedMessageInt,
   r, s,
 )
@@ -147,6 +153,31 @@ fmt.Printf("s: %x\n", s)
 //
 // r: 4a821d5ec008712983929de448b8afb6c24e5a1b97367b9a65b6220d7f083fe3
 // s: 2e4f380e0ea1dfcb7cced430437c98b4570a06b3e929a3b19e6bbd53df2cf3f6
+```
+
+Uncompressing a public key.
+
+```go
+compressedKey, _ := hex.DecodeString("030000000000000000000000000000000000000000000000000000000000000001")
+
+publicKeyX := new(big.Int).SetBytes(compressedKey[1:])
+evenY, oddY := ekliptic.Weierstrass(publicKeyX)
+
+var publicKeyY *big.Int
+if compressedKey[0]%2 == 0 {
+  publicKeyY = evenY
+} else {
+  publicKeyY = oddY
+}
+
+fmt.Println("uncompressed key:")
+fmt.Printf("x: %.64x\n", publicKeyX)
+fmt.Printf("y: %.64x\n", publicKeyY)
+
+// output:
+// uncompressed key:
+// x: 0000000000000000000000000000000000000000000000000000000000000001
+// y: bde70df51939b94c9c24979fa7dd04ebd9b3572da7802290438af2a681895441
 ```
 
 ## Hacking on Ekliptic

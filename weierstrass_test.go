@@ -1,7 +1,6 @@
 package ekliptic
 
 import (
-	"fmt"
 	"math/big"
 	"testing"
 
@@ -53,15 +52,4 @@ func BenchmarkWeierstrass(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Weierstrass(vector.X)
 	}
-}
-
-func ExampleWeierstrass() {
-	evenY, oddY := Weierstrass(big.NewInt(1))
-
-	fmt.Printf("even: %x\n", evenY)
-	fmt.Printf("odd:  %x\n", oddY)
-
-	// output:
-	// even: 4218f20ae6c646b363db68605822fb14264ca8d2587fdd6fbc750d587e76a7ee
-	// odd:  bde70df51939b94c9c24979fa7dd04ebd9b3572da7802290438af2a681895441
 }

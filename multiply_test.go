@@ -1,7 +1,6 @@
 package ekliptic
 
 import (
-	"fmt"
 	"math/big"
 	"testing"
 
@@ -182,32 +181,4 @@ func BenchmarkMultiplyAffineNaive(b *testing.B) {
 			nil,
 		)
 	}
-}
-
-func ExampleMultiplyAffine() {
-	alice, _ := new(big.Int).SetString("94a22a406a6977c1a323f23b9d7678ad08e822834d1df8adece84e30f0c25b6b", 16)
-	bob, _ := new(big.Int).SetString("55ba19100104cbd2842999826e99e478efe6883ac3f3a0c7571034321e0595cf", 16)
-
-	var alicePub, bobPub struct{ x, y big.Int }
-
-	// derive public keys
-	MultiplyBasePoint(alice, &alicePub.x, &alicePub.y)
-	MultiplyBasePoint(bob, &bobPub.x, &bobPub.y)
-
-	var yValueIsUnused big.Int
-
-	// Alice gives Bob her public key, Bob derives the secret
-	bobSharedKey := new(big.Int)
-	MultiplyAffine(&alicePub.x, &alicePub.y, bob, bobSharedKey, &yValueIsUnused, nil)
-
-	// Bob gives Alice his public key, Alice derives the secret
-	aliceSharedKey := new(big.Int)
-	MultiplyAffine(&bobPub.x, &bobPub.y, alice, aliceSharedKey, &yValueIsUnused, nil)
-
-	fmt.Printf("Alice's derived secret: %x\n", aliceSharedKey)
-	fmt.Printf("Bob's derived secret:   %x\n", bobSharedKey)
-
-	// output:
-	// Alice's derived secret: 375a5d26649704863562930ded2193a0569f90f4eb4e63f0fee72c4c05268feb
-	// Bob's derived secret:   375a5d26649704863562930ded2193a0569f90f4eb4e63f0fee72c4c05268feb
 }
