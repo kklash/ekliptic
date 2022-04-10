@@ -21,11 +21,11 @@ func TestMultiplyBasePoint(t *testing.T) {
 
 		if !equal(x, vector.X2) || !equal(y, vector.Y2) {
 			t.Errorf(`multiplying base point failed for vector %d. Got
-	x: %x
-	y: %x
+	x: %.64x
+	y: %.64x
 Wanted:
-	x: %x
-	y: %x
+	x: %.64x
+	y: %.64x
 	`, i, x, y, vector.X2, vector.Y2)
 		}
 	}

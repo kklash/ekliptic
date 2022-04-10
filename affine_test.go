@@ -20,11 +20,11 @@ func TestToAffine(t *testing.T) {
 
 		if !equal(x, vector.X) || !equal(y, vector.Y) {
 			t.Errorf(`jacobian to affine point conversion failed for vector %d. Got:
-	x: %x
-	y: %x
+	x: %.64x
+	y: %.64x
 Wanted:
-	x: %x
-	y: %x
+	x: %.64x
+	y: %.64x
 `, i, x, y, vector.X, vector.Y)
 		}
 	}
