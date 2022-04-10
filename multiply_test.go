@@ -23,11 +23,11 @@ func TestMultiplyJacobi(t *testing.T) {
 
 		if !equal(resultX, vector.X2) || !equal(resultY, vector.Y2) {
 			t.Errorf(`jacobi multiplication failed for vector %d. Got:
-	x: %x
-	y: %x
+	x: %.64x
+	y: %.64x
 Wanted:
-	x: %x
-	y: %x
+	x: %.64x
+	y: %.64x
 `, i, resultX, resultY, vector.X2, vector.Y2)
 		}
 	}
@@ -53,11 +53,11 @@ func TestMultiplyJacobi_MemSafety(t *testing.T) {
 
 		if !equal(x1, vector.X2) || !equal(y1, vector.Y2) {
 			t.Errorf(`jacobi memory-safe multiplication failed for vector %d. Got:
-	x: %x
-	y: %x
+	x: %.64x
+	y: %.64x
 Wanted:
-	x: %x
-	y: %x
+	x: %.64x
+	y: %.64x
 `, i, x1, y1, vector.X2, vector.Y2)
 		}
 	}
@@ -77,11 +77,11 @@ func TestMultiplyAffine(t *testing.T) {
 
 		if !equal(resultX, vector.X2) || !equal(resultY, vector.Y2) {
 			t.Errorf(`affine multiplication failed for vector %d. Got:
-	x: %x
-	y: %x
+	x: %.64x
+	y: %.64x
 Wanted:
-	x: %x
-	y: %x
+	x: %.64x
+	y: %.64x
 `, i, resultX, resultY, vector.X2, vector.Y2)
 		}
 	}
@@ -101,11 +101,11 @@ func TestMultiplyAffineNaive(t *testing.T) {
 
 		if !equal(resultX, vector.X2) || !equal(resultY, vector.Y2) {
 			t.Errorf(`affine naive multiplication failed for vector %d. Got:
-	x: %x
-	y: %x
+	x: %.64x
+	y: %.64x
 Wanted:
-	x: %x
-	y: %x
+	x: %.64x
+	y: %.64x
 `, i, resultX, resultY, vector.X2, vector.Y2)
 		}
 	}

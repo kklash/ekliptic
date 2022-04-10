@@ -13,11 +13,11 @@ func TestWeierstrass(t *testing.T) {
 
 		if !equal(evenY, vector.EvenY) || !equal(oddY, vector.OddY) {
 			t.Errorf(`Weierstrass calculation failed for vector %d. Wanted
-	evenY: %x
-	oddY:  %x
+	evenY: %.64x
+	oddY:  %.64x
 Got:
-	evenY: %x
-	oddY:  %x
+	evenY: %.64x
+	oddY:  %.64x
 `, i, vector.EvenY, vector.OddY, evenY, oddY)
 		}
 	}
@@ -37,7 +37,7 @@ func TestWeierstrass_NotOnCurve(t *testing.T) {
 			defer func() {
 				panicValue := recover()
 				if panicValue == nil {
-					t.Errorf("expected panic when calling Weierstrass on invalid x value: '%x'", x)
+					t.Errorf("expected panic when calling Weierstrass on invalid x value: '%.64x'", x)
 				}
 			}()
 

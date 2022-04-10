@@ -15,13 +15,13 @@ func TestNegate(t *testing.T) {
 		Negate(y)
 
 		if !equal(y, vector.OddY) {
-			t.Errorf("negation from even to odd failed for vector %d.\nWanted 0x%x\n    Got 0x%x", i, vector.OddY, y)
+			t.Errorf("negation from even to odd failed for vector %d.\nWanted 0x%.64x\n    Got 0x%.64x", i, vector.OddY, y)
 		}
 
 		Negate(y)
 
 		if !equal(y, vector.EvenY) {
-			t.Errorf("negation from odd to even failed for vector %d.\nWanted 0x%x\n    Got 0x%x", i, vector.EvenY, y)
+			t.Errorf("negation from odd to even failed for vector %d.\nWanted 0x%.64x\n    Got 0x%.64x", i, vector.EvenY, y)
 		}
 	}
 

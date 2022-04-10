@@ -20,13 +20,13 @@ func TestDoubleJacobi(t *testing.T) {
 
 		if !equal(x3, vector.X3) || !equal(y3, vector.Y3) || !equal(z3, vector.Z3) {
 			t.Errorf(`jacobi point doubling failed for vector %d - Got:
-	x3: %x
-	y3: %x
-	z3: %x
+	x3: %.64x
+	y3: %.64x
+	z3: %.64x
 Wanted:
-	x3: %x
-	y3: %x
-	z3: %x
+	x3: %.64x
+	y3: %.64x
+	z3: %.64x
 `, i, x3, y3, z3, vector.X3, vector.Y3, vector.Z3)
 		}
 	}
@@ -45,13 +45,13 @@ func TestDoubleJacobi_MemSafety(t *testing.T) {
 
 		if !equal(x1, vector.X3) || !equal(y1, vector.Y3) || !equal(z1, vector.Z3) {
 			t.Errorf(`jacobi memory-safe point doubling failed for vector %d - Got:
-	x3: %x
-	y3: %x
-	z3: %x
+	x3: %.64x
+	y3: %.64x
+	z3: %.64x
 Wanted:
-	x3: %x
-	y3: %x
-	z3: %x
+	x3: %.64x
+	y3: %.64x
+	z3: %.64x
 `, i, x1, y1, z1, vector.X3, vector.Y3, vector.Z3)
 		}
 	}
@@ -75,11 +75,11 @@ func TestDoubleAffine(t *testing.T) {
 
 		if !EqualAffine(x3, y3, expectedX, expectedY) {
 			t.Errorf(`affine point doubling failed for vector %d - Got:
-	x3: %x
-	y3: %x
+	x3: %.64x
+	y3: %.64x
 Wanted:
-	x3: %x
-	y3: %x
+	x3: %.64x
+	y3: %.64x
 `, i, x3, y3, expectedX, expectedY)
 		}
 	}
@@ -101,11 +101,11 @@ func TestDoubleAffine_MemSafety(t *testing.T) {
 
 		if !EqualAffine(x1, y1, expectedX, expectedY) {
 			t.Errorf(`affine memory-safe point doubling failed for vector %d - Got:
-	x3: %x
-	y3: %x
+	x3: %.64x
+	y3: %.64x
 Wanted:
-	x3: %x
-	y3: %x
+	x3: %.64x
+	y3: %.64x
 `, i, x1, y1, expectedX, expectedY)
 		}
 	}
