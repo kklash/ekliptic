@@ -27,6 +27,12 @@ func MultiplyJacobi(
 		panic("MultiplyJacobi: refusing to multiply point not on the curve; this could leak private data")
 	}
 
+	// save the bits ahead of time in case k points to the same int as one of the outputs.
+	kBits := make([]bool, k.BitLen())
+	for i := range kBits {
+		kBits[i] = k.Bit(i) > 0
+	}
+
 	doubleX := new(big.Int).Set(x1)
 	doubleY := new(big.Int).Set(y1)
 	doubleZ := new(big.Int).Set(z1)
@@ -35,8 +41,8 @@ func MultiplyJacobi(
 	y2.Set(zero)
 	z2.Set(zero)
 
-	for i := 0; i < k.BitLen(); i++ {
-		if k.Bit(i) > 0 {
+	for i, shouldAdd := range kBits {
+		if shouldAdd {
 			AddJacobi(
 				x2, y2, z2,
 				doubleX, doubleY, doubleZ,

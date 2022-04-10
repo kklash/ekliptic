@@ -38,6 +38,7 @@ func TestMultiplyJacobi_MemSafety(t *testing.T) {
 	y1 := new(big.Int)
 	z1 := new(big.Int)
 
+	// inputs and outputs are the same pointers
 	for i, vector := range test_vectors.AffineMultiplicationVectors {
 		x1.Set(vector.X1)
 		y1.Set(vector.Y1)
@@ -52,13 +53,40 @@ func TestMultiplyJacobi_MemSafety(t *testing.T) {
 		ToAffine(x1, y1, z1)
 
 		if !equal(x1, vector.X2) || !equal(y1, vector.Y2) {
-			t.Errorf(`jacobi memory-safe multiplication failed for vector %d. Got:
+			t.Errorf(`jacobi memory-safe (P1 & result shared) multiplication failed for vector %d. Got:
 	x: %.64x
 	y: %.64x
 Wanted:
 	x: %.64x
 	y: %.64x
 `, i, x1, y1, vector.X2, vector.Y2)
+		}
+	}
+
+	resultX := new(big.Int)
+	resultY := new(big.Int)
+	resultZ := new(big.Int)
+
+	// k is also an output pointer
+	for i, vector := range test_vectors.AffineMultiplicationVectors {
+		resultY.Set(vector.K)
+
+		MultiplyJacobi(
+			vector.X1, vector.Y1, one,
+			resultY,
+			resultX, resultY, resultZ,
+			nil,
+		)
+		ToAffine(resultX, resultY, resultZ)
+
+		if !equal(resultX, vector.X2) || !equal(resultY, vector.Y2) {
+			t.Errorf(`jacobi memory-safe (K & result shared) multiplication failed for vector %d. Got:
+	x: %.64x
+	y: %.64x
+Wanted:
+	x: %.64x
+	y: %.64x
+`, i, resultX, resultY, vector.X2, vector.Y2)
 		}
 	}
 }
