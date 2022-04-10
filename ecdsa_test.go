@@ -25,6 +25,16 @@ Wanted:
 	r: %.64x
 	s: %.64x
 `, i, r, s, vector.R, vector.S)
+			return
+		}
+
+		pubX := new(big.Int)
+		pubY := new(big.Int)
+		MultiplyBasePoint(vector.PrivateKey, pubX, pubY)
+
+		if !VerifyECDSA(vector.Hash, vector.R, vector.S, pubX, pubY) {
+			t.Errorf("failed to verify ECDSA signature for vector %d", i)
+			return
 		}
 	}
 }
@@ -40,5 +50,18 @@ func BenchmarkSignECDSA(b *testing.B) {
 			vector.PrivateKey, vector.Nonce, vector.Hash,
 			r, s,
 		)
+	}
+}
+
+func BenchmarkVerifyECDSA(b *testing.B) {
+	vector := test_vectors.ECDSAVectors[4]
+	pubX := new(big.Int)
+	pubY := new(big.Int)
+	MultiplyBasePoint(vector.PrivateKey, pubX, pubY)
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		VerifyECDSA(vector.Hash, vector.R, vector.S, pubX, pubY)
 	}
 }

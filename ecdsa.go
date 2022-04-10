@@ -42,3 +42,39 @@ func SignECDSA(
 		s.Sub(Secp256k1_CurveOrder, s)
 	}
 }
+
+// VerifyECDSA returns true if the given signature (r, s) is a valid signature on message hash z
+// from the given public key (pubX, pubY). Note that non-canonical ECDSA signatures (where s > N/2)
+// are acceptable.
+func VerifyECDSA(
+	z *big.Int,
+	r, s *big.Int,
+	pubX, pubY *big.Int,
+) bool {
+	sInverse := new(big.Int).ModInverse(s, Secp256k1_CurveOrder)
+
+	u1 := new(big.Int).Mul(sInverse, z)
+	u1.Mod(u1, Secp256k1_CurveOrder)
+
+	u2 := sInverse.Mul(sInverse, r)
+	u2.Mod(u2, Secp256k1_CurveOrder)
+	sInverse = nil
+
+	u1Gx := u1
+	u1Gy := new(big.Int)
+	MultiplyBasePoint(u1, u1Gx, u1Gy)
+	u1 = nil
+
+	u2Hx := u2
+	u2Hy := new(big.Int)
+	MultiplyAffine(pubX, pubY, u2, u2Hx, u2Hy, nil)
+	u2 = nil
+
+	px := u1Gx
+	AddAffine(u1Gx, u1Gy, u2Hx, u2Hy, px, u1Gy)
+	px.Mod(px, Secp256k1_CurveOrder)
+	u1Gx = nil
+	u1Gy = nil
+
+	return equal(r, px)
+}
