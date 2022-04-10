@@ -83,10 +83,17 @@ func ExampleSignECDSA() {
 	fmt.Printf("r: %x\n", r)
 	fmt.Printf("s: %x\n", s)
 
+	var pub struct{ x, y big.Int }
+	ekliptic.MultiplyBasePoint(key, &pub.x, &pub.y)
+
+	valid := ekliptic.VerifyECDSA(hashedMessageInt, r, s, &pub.x, &pub.y)
+	fmt.Printf("valid: %v\n", valid)
+
 	// output:
 	//
 	// r: 4a821d5ec008712983929de448b8afb6c24e5a1b97367b9a65b6220d7f083fe3
 	// s: 2e4f380e0ea1dfcb7cced430437c98b4570a06b3e929a3b19e6bbd53df2cf3f6
+	// valid: true
 }
 
 // Find possible Y-coordinates for an X. Used to uncompress a public key, where

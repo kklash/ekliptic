@@ -118,7 +118,7 @@ fmt.Printf("Bob's derived secret:   %x\n", bobSharedKey)
 // Bob's derived secret:   375a5d26649704863562930ded2193a0569f90f4eb4e63f0fee72c4c05268feb
 ```
 
-Signing a message with ECDSA.
+Signing and verifying a message with ECDSA.
 
 ```go
 import (
@@ -149,10 +149,17 @@ ekliptic.SignECDSA(
 fmt.Printf("r: %x\n", r)
 fmt.Printf("s: %x\n", s)
 
+var pub struct{ x, y big.Int }
+ekliptic.MultiplyBasePoint(key, &pub.x, &pub.y)
+
+valid := ekliptic.VerifyECDSA(hashedMessageInt, r, s, &pub.x, &pub.y)
+fmt.Printf("valid: %v\n", valid)
+
 // output:
 //
 // r: 4a821d5ec008712983929de448b8afb6c24e5a1b97367b9a65b6220d7f083fe3
 // s: 2e4f380e0ea1dfcb7cced430437c98b4570a06b3e929a3b19e6bbd53df2cf3f6
+// valid: true
 ```
 
 Uncompressing a public key.
