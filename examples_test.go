@@ -1,6 +1,8 @@
 package ekliptic_test
 
 import (
+	"crypto/ecdsa"
+	"crypto/rand"
 	cryptorand "crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
@@ -110,4 +112,33 @@ func ExampleWeierstrass() {
 	// uncompressed key:
 	// x: 0000000000000000000000000000000000000000000000000000000000000001
 	// y: bde70df51939b94c9c24979fa7dd04ebd9b3572da7802290438af2a681895441
+}
+
+func ExampleCurve() {
+	d, _ := new(big.Int).SetString("18e14a7b6a307f426a94f8114701e7c8e774e7f9a47e2c2035db29a206321725", 16)
+	key := &ecdsa.PrivateKey{
+		D: d,
+		PublicKey: ecdsa.PublicKey{
+			Curve: new(ekliptic.Curve),
+			X:     new(big.Int),
+			Y:     new(big.Int),
+		},
+	}
+
+	// Compute the public key
+	ekliptic.MultiplyBasePoint(key.D, key.X, key.Y)
+
+	hashedMessage := sha256.Sum256([]byte("i love you"))
+
+	r, s, err := ecdsa.Sign(rand.Reader, key, hashedMessage[:])
+	if err != nil {
+		panic("failed to compute signature: " + err.Error())
+	}
+
+	if ecdsa.Verify(&key.PublicKey, hashedMessage[:], r, s) {
+		fmt.Println("verified ECDSA signature using crypto/ecdsa")
+	}
+
+	// output:
+	// verified ECDSA signature using crypto/ecdsa
 }
