@@ -164,7 +164,8 @@ Test vectors stored in [`test_vectors`](./test_vectors) can be verified using th
 
 | Validates against | Command to run |
 |------------------|----------------|
-|[`paritytech/libsecp256k1`](https://github.com/paritytech/libsecp256k1) (Rust) |`cargo run --manifest-path ./test_vectors/validate_rs/{Cargo.toml,}`|
+|[`paritytech/libsecp256k1`](https://github.com/paritytech/libsecp256k1) (Rust)|`cargo run --manifest-path ./test_vectors/validate_rs/{Cargo.toml,}`|
+|[`cslashm/ECPy`](https://github.com/cslashm/ECPy) (Python)|`pip3 install --user ECPy && python3 test_vectors/validate.py`|
 
 
 ## Performance Optimizations
