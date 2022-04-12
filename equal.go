@@ -44,13 +44,6 @@ func EqualJacobi(
 		return equal(x1, x2) && equal(y1, y2)
 	}
 
-	x1 = new(big.Int).Set(x1)
-	y1 = new(big.Int).Set(y1)
-	z1 = new(big.Int).Set(z1)
-	x2 = new(big.Int).Set(x2)
-	y2 = new(big.Int).Set(y2)
-	z2 = new(big.Int).Set(z2)
-
 	// z1² and z2²
 	z1_pow2 := new(big.Int).Mul(z1, z1)
 	z2_pow2 := new(big.Int).Mul(z2, z2)
