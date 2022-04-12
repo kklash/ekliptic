@@ -53,23 +53,30 @@ func VerifyECDSA(
 ) bool {
 	sInverse := new(big.Int).ModInverse(s, Secp256k1_CurveOrder)
 
+	// u1 = s⁻¹ * z mod N
 	u1 := new(big.Int).Mul(sInverse, z)
 	u1.Mod(u1, Secp256k1_CurveOrder)
 
+	// u2 = s⁻¹ * r mod N
 	u2 := sInverse.Mul(sInverse, r)
 	u2.Mod(u2, Secp256k1_CurveOrder)
 	sInverse = nil
 
+	// u1G = G * u1
 	u1Gx := u1
 	u1Gy := new(big.Int)
 	MultiplyBasePoint(u1, u1Gx, u1Gy)
 	u1 = nil
 
+	// H = (pubX, pubY)
+	// u2H = H * u2
 	u2Hx := u2
 	u2Hy := new(big.Int)
 	MultiplyAffine(pubX, pubY, u2, u2Hx, u2Hy, nil)
 	u2 = nil
 
+	// P = u1G + u2H
+	// px = x(p) mod N
 	px := u1Gx
 	AddAffine(u1Gx, u1Gy, u2Hx, u2Hy, px, u1Gy)
 	px.Mod(px, Secp256k1_CurveOrder)
