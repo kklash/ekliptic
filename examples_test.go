@@ -13,6 +13,10 @@ import (
 	"github.com/kklash/ekliptic"
 )
 
+// *** ATTENTION ***
+// *****************
+// Modifying this file? Make sure to copy the changes to the README's examples section!
+
 // Generate a public key from a private key.
 func ExampleMultiplyBasePoint() {
 	privateKey, _ := new(big.Int).SetString("c370af8c091812ef7f6bfaffb494b1046fb25486c9873243b80826daef3ec583", 16)
