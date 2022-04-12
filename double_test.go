@@ -128,6 +128,24 @@ func BenchmarkDoubleJacobi_Z1(b *testing.B) {
 	}
 }
 
+// Benchmarks doubling jacobi points where z > 1
+func BenchmarkDoubleJacobi_LargeZ(b *testing.B) {
+	x3 := new(big.Int)
+	y3 := new(big.Int)
+	z3 := new(big.Int)
+
+	// point to double where z > 1
+	vector := test_vectors.JacobiDoublingVectors[2]
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		DoubleJacobi(
+			vector.X1, vector.Y1, vector.Z1,
+			x3, y3, z3,
+		)
+	}
+}
+
 func doubleJacobiWithAllocate(
 	x1, y1, z1 *big.Int,
 ) (x3, y3, z3 *big.Int) {
@@ -143,8 +161,8 @@ func doubleJacobiWithAllocate(
 	return x3, y3, z3
 }
 
-// Benchmarks doubling jacobi points while allocating new big.Ints for each call
-func BenchmarkDoubleJacobi_WithAllocation(b *testing.B) {
+// Benchmarks doubling jacobi points while allocating new big.Ints for each call where Z = 1
+func BenchmarkDoubleJacobi_Z1_WithAllocate(b *testing.B) {
 	vector := test_vectors.JacobiDoublingVectors[0]
 
 	for i := 0; i < b.N; i++ {
@@ -154,26 +172,13 @@ func BenchmarkDoubleJacobi_WithAllocation(b *testing.B) {
 	}
 }
 
-// Benchmarks doubling jacobi points where z > 1
-func BenchmarkDoubleJacobi_LargeZ(b *testing.B) {
-	x3 := new(big.Int)
-	y3 := new(big.Int)
-	z3 := new(big.Int)
+// Benchmarks doubling jacobi points while allocating new big.Ints for each call, where Z > 1
+func BenchmarkDoubleJacobi_LargeZ_WithAllocate(b *testing.B) {
+	vector := test_vectors.JacobiDoublingVectors[2]
 
-	// find first point to double where z > 1
-	var vector *test_vectors.JacobiDoublingVector
-	for i := 0; i < len(test_vectors.JacobiDoublingVectors); i++ {
-		vector = test_vectors.JacobiDoublingVectors[i]
-		if !equal(vector.Z1, one) {
-			break
-		}
-	}
-
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		DoubleJacobi(
+		doubleJacobiWithAllocate(
 			vector.X1, vector.Y1, vector.Z1,
-			x3, y3, z3,
 		)
 	}
 }

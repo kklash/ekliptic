@@ -183,9 +183,23 @@ func addJacobiWithAllocate(
 }
 
 // Benchmarks adding jacobi point, allocating return values each time
-func BenchmarkAddJacobi_WithAllocate(b *testing.B) {
+func BenchmarkAddJacobi_Z1_WithAllocate(b *testing.B) {
+	vector := test_vectors.JacobiAdditionVectors[0] // where both points' z = 1
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		addJacobiWithAllocate(
+			vector.X1, vector.Y1, vector.Z1,
+			vector.X2, vector.Y2, vector.Z2,
+		)
+	}
+}
+
+// Benchmarks adding jacobi point, allocating return values each time
+func BenchmarkAddJacobi_LargeZ_WithAllocate(b *testing.B) {
 	vector := test_vectors.JacobiAdditionVectors[118] // both points' z > 1
 
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		addJacobiWithAllocate(
 			vector.X1, vector.Y1, vector.Z1,
