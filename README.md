@@ -10,17 +10,15 @@ This library is not finished, stable, or audited - depend on it at your own peri
 
 ## Elliptic-whah?
 
-Elliptic curve cryptography is a relatively new field of [asymmetric public-key cryptography](https://cryptobook.nakov.com/asymmetric-key-ciphers). An elliptic curve is just a cubic equation of a particular form. The secp256k1 curve, for example, is `y² = x³ + 7`. To make this curve equation useful, we first define an addition operation that 'adds' two `(x, y)` points on the curve to produce a third point _also_ on the curve. From that, you can create a multiplication operation to multiply a 2D point by some 1D (scalar) number, by simply adding the point to itself many times.
+Elliptic curve cryptography is a relatively new field of [asymmetric public-key cryptography](https://cryptobook.nakov.com/asymmetric-key-ciphers). An elliptic curve is just a cubic equation of a particular form. The secp256k1 curve, for example, is $y^2 = x^3 + 7$ . To make this curve equation useful, we first define an addition operation that 'adds' two $(x, y)$ points on the curve to produce a third point _also_ on the curve. From that, you can create a multiplication operation to multiply a 2D point by some 1D (scalar) number, by simply adding the point to itself many times.
 
 It just so happens that due to the particular properties of elliptic curves, if you multiply some publicly known point by a secret number, that operation is extremely hard to reverse, and you end up with another point that is mathematically related to the secret number. Functions that are easy to compute but hard to reverse are a fundamental building block of cryptography, and people started to realize you could use this feature of elliptic curve equations as a basis for new public-key cryptosystems, like RSA, but using much smaller numbers in a 2D space.
 
-The unique one-way function of elliptic curve cryptography is _base point multiplication over a finite field,_ (the 'finite field' part means all coordinate values are taken modulo some large prime number). A base point is a publicly known `(x, y)` point, often called the _generator_ point `G`, which all parties agree upon. The private key in this cryptosystem is a scalar number `k` which is multiplied with the base point. The point resulting from base point multiplication `P` becomes the public key. `P` and `G` are capitalized to denote that they are 2D points, while `k` is a lone positive integer. Base point multiplication is written mathematically as
+The unique one-way function of elliptic curve cryptography is _base point multiplication over a finite field,_ (the 'finite field' part means all coordinate values are taken modulo some large prime number). A base point is a publicly known $(x, y)$ point, often called the _generator_ point $G$, which all parties agree upon. The private key in this cryptosystem is a scalar number $k$ which is multiplied with the base point. The point resulting from base point multiplication $P$ becomes the public key. $P$ and $G$ are capitalized to denote that they are 2D points, while $k$ is a lone positive integer. Base point multiplication is written mathematically as
 
-```
-P = k * G
-```
+$$P = k G$$
 
-Point multiplication is _believed_ to be hard to undo: There's no way to quickly compute `k` if you only know `P` and `G`. The only known way to efficiently perform `P / G` would be to run Shor's Algorithm on a quantum computer that can operate with at least `6 * log2(k)` qubits. This currently doesn't exist, so at least for now, elliptic curve cryptography provides a safe way to sign/verify and encrypt/decrypt information asymetrically.
+Point multiplication is _believed_ to be hard to undo: There's no way to quickly compute $k$ if you only know $P$ and $G$. The only known way to efficiently perform $P \div G$ would be to run Shor's Algorithm on a quantum computer that can operate with at least $6\cdot \log_2(k)$ qubits. This currently doesn't exist, so at least for now, elliptic curve cryptography provides a safe way to sign/verify and encrypt/decrypt information asymetrically.
 
 
 ## Down Sides
@@ -33,7 +31,7 @@ Thankfully, the secp256k1 curve was designed in a non-random 'nothing up my slee
 
 Primarily, for performance. Elliptic curves offer a way to perform cryptography faster for the same degree of security.
 
-A 256-bit elliptic curve key provides roughly the same degree of security as a 2048-bit RSA key. But for normal 'happy path' operations where you're not trying attack the cryptosystem, elliptic curve operations are _vastly_ faster, simply due to the size of the numbers involved. It's easier to multiply `5 x 9` than to multiply `555 x 999`.
+A 256-bit elliptic curve key provides roughly the same degree of security as a 2048-bit RSA key. But for normal 'happy path' operations where you're not trying attack the cryptosystem, elliptic curve operations are _vastly_ faster, simply due to the size of the numbers involved. It's easier to multiply $5 \cdot 9$ than to multiply $555 \cdot 999$.
 
 Consider this simple benchmark which compares 256-bit ECC and 2048-bit RSA private and public key generation:
 
@@ -280,16 +278,15 @@ In the above example, `a` is no longer needed, so we reclaim its memory as a new
 
 ### Jacobian Points
 
-This library offers support for both affine and Jacobian point math. Affine coordinates are 'normal' two-dimensional coordinates, `x` and `y`, which unambiguously describes a point on the plane. Jacobian coordinates are a three-dimensional representation of an affine point, (Ax, Ay), in terms of three variables: (x, y, z) such that:
+This library offers support for both affine and Jacobian point math. Affine coordinates are 'normal' two-dimensional coordinates, $x$ and $y$, which unambiguously describes a point on the plane. Jacobian coordinates are a three-dimensional representation of an affine point, $(x_a,\ y_a)$, in terms of three variables: $(x_j,\ y_j,\  z)$ such that:
 
-```
-Ax = x / z²
-Ay = y / z³
-```
+$$x_a = \frac{x_j}{z^2}$$
 
-This relationship means there are an absurdly large number of possible Jacobian coordinate triplets which describe the same affine point. Each affine coordinate is basically converted into a ratio of `x:z` and `y:z`, thus proportional ratios simplify to the same affine point.
+$$y_a = \frac{y_j}{z^3}$$
 
-Why would we want to represent points this way? Elliptic curve multiplication - a critical primitive for almost any elliptic-curve cryptography - involves performing many addition operations in a row. That's what multiplication means, after all. When you add two affine `(x, y)` points together in an elliptic curve, you have to perform some finite field division, AKA modular inversion, to get a result back in affine form. Modular inversion is a very expensive operation compared to multiplication. Instead of dividing after _every_ addition operation, you can defer the division until the end of the multiplication sequence, by accumulating in the divisor coordinate `z`. After the multiplication operation is done, the point can be converted back to affine, or used for new EC operations, as needed.
+This relationship means there are an absurdly large number of possible Jacobian coordinate triplets which describe the same affine point. Each affine coordinate is basically converted into a ratio of $x:z$ and $y:z$, thus proportional ratios simplify to the same affine point.
+
+Why would we want to represent points this way? Elliptic curve multiplication - a critical primitive for almost any elliptic-curve cryptography - involves performing many addition operations in a row. That's what multiplication means, after all. When you add two affine $(x, y)$ points together in an elliptic curve, you have to perform some finite field division, AKA modular inversion, to get a result back in affine form. Modular inversion is a very expensive operation compared to multiplication. Instead of dividing after _every_ addition operation, you can defer the division until the end of the multiplication sequence, by accumulating in the divisor coordinate $z$. After the multiplication operation is done, the point can be converted back to affine, or used for new EC operations, as needed.
 
 To demonstrate, notice how expensive a naive affine multiplication is compared to a Jacobian multiplication:
 
@@ -303,7 +300,7 @@ BenchmarkMultiplyAffineNaive-6                 442     2480711 ns/op    545915 B
 
 ### Precomputation
 
-You can improve multiplication performance even more by using precomputed doubles of the secp256k1 base-point. Precomputing `G * 2^i` for `i` in `[0..256]` significantly boosts performance for base-point [double-and-add multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Double-and-add), especially if [the precomputed doubles are saved in affine form](./precomputed_doubles.go). Values are computed using the `ekliptic.ComputePointDoubles` function, [triggered by `go generate`](./genprecompute).
+You can improve multiplication performance even more by using precomputed doubles of the secp256k1 base-point. Precomputing $ 2^iG$ for $i$ in $[0, 255]$ significantly boosts performance for base-point [double-and-add multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Double-and-add), especially if [the precomputed doubles are saved in affine form](./precomputed_doubles.go). Values are computed using the `ekliptic.ComputePointDoubles` function, [triggered by `go generate`](./genprecompute).
 
 ### Other Performance Notes
 
