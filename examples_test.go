@@ -96,7 +96,7 @@ func ExampleSignECDSA() {
 	// output:
 	//
 	// r: 4a821d5ec008712983929de448b8afb6c24e5a1b97367b9a65b6220d7f083fe3
-	// s: 2e4f380e0ea1dfcb7cced430437c98b4570a06b3e929a3b19e6bbd53df2cf3f6
+	// s: 381d053be61243d950865d7b8eb6b5ba48fbabfe7fda81af3183a184a02f5d51
 	// valid: true
 }
 
