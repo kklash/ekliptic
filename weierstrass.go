@@ -5,8 +5,8 @@ import (
 )
 
 // Weierstrass solves the Weierstrass form elliptic curve equation for y, given an affine value of x:
-//  y² = x³ + ax + b
-// ...where a = 0 and b = 7 - these are secp256k1 curve constants.
+//  y² = x³ + ax + b mod P
+// ...where a = 0, b = 7 and P is Secp256k1_P - the secp256k1 curve constants.
 //
 // It returns the two possible values of y: an even value and an odd value. You could also call this function "GetYValues(x)".
 // This is useful for uncompressing public keys, which in secp256k1 often supply only the-x coordinate, and maybe a specifier
