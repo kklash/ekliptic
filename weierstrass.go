@@ -11,9 +11,12 @@ import (
 // It returns the two possible values of y: an even value and an odd value. You could also call this function "GetYValues(x)".
 // This is useful for uncompressing public keys, which in secp256k1 often supply only the-x coordinate, and maybe a specifier
 // indicating whether the y-coordinate is even or odd.
+//
+// Returns two nil values if x is not a valid coordinate on the secp256k1 curve.
 func Weierstrass(x *big.Int) (evenY, oddY *big.Int) {
 	if x.Cmp(Secp256k1_P) >= 0 {
-		panic("Weierstrass(x): x is larger than curve modulus P; point would not be on the curve")
+		// x is larger than curve modulus P; point would not be on the curve
+		return nil, nil
 	}
 
 	// c = x³ + ax + b
@@ -29,7 +32,8 @@ func Weierstrass(x *big.Int) (evenY, oddY *big.Int) {
 	ySquared := new(big.Int).Mul(y, y)
 	mod(ySquared)
 	if !equal(c, ySquared) {
-		panic("Weierstrass(x): c != y² mod p - this means the given x-coordinate is not on the curve")
+		// c != y² mod p - this means the given x-coordinate is not on the curve
+		return nil, nil
 	}
 
 	// if y is even, -y is odd, and vice-versa.
