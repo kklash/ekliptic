@@ -10,7 +10,7 @@ This library is not finished, stable, or audited - depend on it at your own peri
 
 ## Elliptic-whah?
 
-Elliptic curve cryptography is a relatively new field of [asymmetric public-key cryptography](https://cryptobook.nakov.com/asymmetric-key-ciphers). An elliptic curve is just a cubic equation of a particular form. The secp256k1 curve, for example, is $y^2 = x^3 + 7$ . To make this curve equation useful, we first define an addition operation that 'adds' two $(x, y)$ points on the curve to produce a third point _also_ on the curve. From that, you can create a multiplication operation to multiply a 2D point by some 1D (scalar) number, by simply adding the point to itself many times.
+Elliptic curve cryptography is a relatively new field of [asymmetric public-key cryptography](https://cryptobook.nakov.com/asymmetric-key-ciphers). An elliptic curve is just a cubic equation of a particular form. The secp256k1 curve, for example, is $y^{2}=x^3+7$. To make this curve equation useful, we first define an addition operation that 'adds' two $x,y$ points on the curve to produce a third point _also_ on the curve. From that, you can create a multiplication operation to multiply a 2D point by some 1D (scalar) number, by simply adding the point to itself many times.
 
 It just so happens that due to the particular properties of elliptic curves, if you multiply some publicly known point by a secret number, that operation is extremely hard to reverse, and you end up with another point that is mathematically related to the secret number. Functions that are easy to compute but hard to reverse are a fundamental building block of cryptography, and people started to realize you could use this feature of elliptic curve equations as a basis for new public-key cryptosystems, like RSA, but using much smaller numbers in a 2D space.
 
@@ -278,7 +278,7 @@ In the above example, `a` is no longer needed, so we reclaim its memory as a new
 
 ### Jacobian Points
 
-This library offers support for both affine and Jacobian point math. Affine coordinates are 'normal' two-dimensional coordinates, $x$ and $y$, which unambiguously describes a point on the plane. Jacobian coordinates are a three-dimensional representation of an affine point, $(x_a,\ y_a)$, in terms of three variables: $(x_j,\ y_j,\  z)$ such that:
+This library offers support for both affine and Jacobian point math. Affine coordinates are 'normal' two-dimensional coordinates, $x$ and $y$, which unambiguously describes a point on the plane. Jacobian coordinates are a three-dimensional representation of an affine point, $x_a,y_a$, in terms of three variables: $x_j,y_j,z$ such that:
 
 $$x_a = \frac{x_j}{z^2}$$
 
@@ -300,7 +300,7 @@ BenchmarkMultiplyAffineNaive-6                 442     2480711 ns/op    545915 B
 
 ### Precomputation
 
-You can improve multiplication performance even more by using precomputed doubles of the secp256k1 base-point. Precomputing $ 2^iG$ for $i$ in $[0, 255]$ significantly boosts performance for base-point [double-and-add multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Double-and-add), especially if [the precomputed doubles are saved in affine form](./precomputed_doubles.go). Values are computed using the `ekliptic.ComputePointDoubles` function, [triggered by `go generate`](./genprecompute).
+You can improve multiplication performance even more by using precomputed doubles of the secp256k1 base-point. Precomputing $2^iG$ for $0 <= i <= 255$ significantly boosts performance for base-point [double-and-add multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Double-and-add), especially if [the precomputed doubles are saved in affine form](./precomputed_doubles.go). Values are computed using the `ekliptic.ComputePointDoubles` function, [triggered by `go generate`](./genprecompute).
 
 ### Other Performance Notes
 
