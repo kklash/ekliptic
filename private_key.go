@@ -15,3 +15,9 @@ func NewPrivateKey(random io.Reader) (*big.Int, error) {
 	}
 	return r.Add(r, one), nil
 }
+
+// IsValidScalar returns true if the given integer is a valid secp256k1 private key,
+// i.e. a number in the range [1, N) where N is the secp256k1 curve order.
+func IsValidScalar(d *big.Int) bool {
+	return d.Cmp(zero) == 1 && d.Cmp(Secp256k1_CurveOrder) == -1
+}
