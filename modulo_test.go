@@ -29,7 +29,7 @@ func TestMultiplyNonModulo(t *testing.T) {
 		start = time.Now()
 		for j := 0; j < multOps; j++ {
 			n.Set(z)
-			mod(n)
+			modCoordinate(n)
 		}
 
 		fmt.Printf("mod(%d-bits): %d ns/op\n\n", nBits, (int(time.Since(start)) / multOps))

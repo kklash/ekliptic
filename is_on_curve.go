@@ -13,13 +13,13 @@ func IsOnCurveAffine(x, y *big.Int) bool {
 
 	// y²
 	left := new(big.Int).Mul(y, y)
-	mod(left)
+	modCoordinate(left)
 
 	// x³ + ax + b
 	right := new(big.Int).Mul(x, x)
 	right.Mul(right, x)
 	right.Add(right, Secp256k1_B)
-	mod(right)
+	modCoordinate(right)
 
 	return equal(left, right)
 }
@@ -57,7 +57,7 @@ func IsOnCurveJacobi(x, y, z *big.Int) bool {
 
 	// y²
 	left := new(big.Int).Mul(y, y)
-	mod(left)
+	modCoordinate(left)
 
 	// z⁶b
 	// This is more efficient for larger powers than repeated .Mul() calls
@@ -68,7 +68,7 @@ func IsOnCurveJacobi(x, y, z *big.Int) bool {
 	right := new(big.Int).Mul(x, x)
 	right.Mul(right, x)
 	right.Add(right, z6b)
-	mod(right)
+	modCoordinate(right)
 
 	return equal(left, right)
 }

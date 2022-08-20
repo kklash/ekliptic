@@ -54,12 +54,12 @@ func DoubleJacobi(
 	// x3 = f - 2 * d
 	x3.Mul(d, two)
 	x3.Sub(f, x3)
-	mod(x3)
+	modCoordinate(x3)
 
 	// z3 = 2 * y1 * z1
 	z3.Mul(y1, z1)
 	z3.Mul(z3, two)
-	mod(z3)
+	modCoordinate(z3)
 
 	// *** Ensure y3 is set AFTER z3. If y3 points to the same bigint  ***
 	// *** as y1, this will mutate y1, which is needed to calculate z3 ***
@@ -69,7 +69,7 @@ func DoubleJacobi(
 	y3.Mul(y3, e)
 	y3.Sub(y3, c.Mul(c, eight))
 	c = nil
-	mod(y3)
+	modCoordinate(y3)
 }
 
 //  m = (3*x1²+a) / (2*y1)

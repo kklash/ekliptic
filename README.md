@@ -305,7 +305,7 @@ You can improve multiplication performance even more by using precomputed double
 ### Other Performance Notes
 
 - We have [a special implementation which checks for Jacobi point validity without costly affine conversion.](./is_on_curve.go)
-- Golang's `big.Int` has some operations which are more costly than others. For example, doing `n.Exp(n, two, P)` is more costly than doing `n.Mul(n, n); mod(n)`. This holds for squaring and cubing, but exponents beyond 3 require `.Exp` for the best performance.
+- Golang's `big.Int` has some operations which are more costly than others. For example, doing `n.Exp(n, two, P)` is more costly than doing `n.Mul(n, n); modCoordinate(n)`. This holds for squaring and cubing, but exponents beyond 3 require `.Exp` for the best performance.
 
 ### Thanks!
 

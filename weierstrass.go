@@ -29,13 +29,13 @@ func Weierstrass(x *big.Int) (evenY, oddY *big.Int) {
 	c.Mul(x, x)
 	c.Mul(c, x)
 	c.Add(c, Secp256k1_B)
-	mod(c)
+	modCoordinate(c)
 
 	// this is actually faster than using big.Int's ModSqrt method.
 	y := new(big.Int).Exp(c, squareRootExp, Secp256k1_P) // y = c^((p+1)/4)
 
 	ySquared := new(big.Int).Mul(y, y)
-	mod(ySquared)
+	modCoordinate(ySquared)
 	if !equal(c, ySquared) {
 		// c != y² mod p - this means the given x-coordinate is not on the curve
 		return nil, nil

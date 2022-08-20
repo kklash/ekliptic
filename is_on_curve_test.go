@@ -22,7 +22,7 @@ func TestIsOnCurveJacobi(t *testing.T) {
 			x.Add(x, one)
 		case 1:
 			y.Mul(y, two)
-			mod(y)
+			modCoordinate(y)
 		case 2:
 			z.Sub(z, one)
 		}
@@ -50,7 +50,7 @@ func TestIsOnCurveAffine(t *testing.T) {
 			x.Add(x, one)
 		case 1:
 			y.Mul(y, two)
-			mod(y)
+			modCoordinate(y)
 		}
 
 		if IsOnCurveAffine(x, y) {

@@ -19,16 +19,16 @@ func ToAffine(x, y, z *big.Int) {
 		return
 	}
 
-	invert(z)
+	invertCoordinate(z)
 
 	x.Mul(x, z)
 	x.Mul(x, z)
-	mod(x)
+	modCoordinate(x)
 
 	y.Mul(y, z)
 	y.Mul(y, z)
 	y.Mul(y, z)
-	mod(y)
+	modCoordinate(y)
 
 	z.Set(one)
 }

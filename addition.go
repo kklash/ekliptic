@@ -78,12 +78,12 @@ func AddJacobi(
 	// h = u2 - u1
 	h := u2.Sub(u2, u1)
 	u2 = nil
-	mod(h)
+	modCoordinate(h)
 
 	// r = s2 - s1
 	r := s2.Sub(s2, s1)
 	s2 = nil
-	mod(r)
+	modCoordinate(r)
 
 	//  h = (x2 * z1²) - (x1 * z2²)
 	//  r = (y2 * z1³) - (y1 * z2³)
@@ -137,19 +137,19 @@ func AddJacobi(
 	x3.Sub(x3, hhh)
 	x3.Sub(x3, v)
 	x3.Sub(x3, v)
-	mod(x3)
+	modCoordinate(x3)
 
 	// y3 = r * (v - x3) - s1 * h³
 	y3.Sub(v, x3)
 	y3.Mul(r, y3)
 	y3.Sub(y3, s1.Mul(s1, hhh))
 	s1 = nil
-	mod(y3)
+	modCoordinate(y3)
 
 	// z3 = z1 * z2 * h
 	z3.Mul(z1, z2)
 	z3.Mul(z3, h)
-	mod(z3)
+	modCoordinate(z3)
 }
 
 // AddAffine adds two affine points together:
@@ -207,16 +207,16 @@ func AddAffine(
 		m.Mul(x1, x1)
 		m.Mul(m, three)
 		twoY1Inverse := buf.Mul(y1, two)
-		invert(twoY1Inverse)
+		invertCoordinate(twoY1Inverse)
 		m.Mul(m, twoY1Inverse)
 	} else {
 		//  m = (y2 - y1) / (x2 - x1)
 		m.Sub(y2, y1)
 		xDiffInverse := buf.Sub(x2, x1)
-		invert(xDiffInverse)
+		invertCoordinate(xDiffInverse)
 		m.Mul(m, xDiffInverse)
 	}
-	mod(m)
+	modCoordinate(m)
 
 	// Memory-safety: if result pointers are also input parameter pointers, we don't want to
 	// modify P1 and P2 until we're done using them.
@@ -237,11 +237,11 @@ func AddAffine(
 	x3.Mul(m, m)
 	x3.Sub(x3, x1)
 	x3.Sub(x3, x2)
-	mod(x3)
+	modCoordinate(x3)
 
 	// y3 = m * (x1 - x3) - y1
 	y3.Sub(x1, x3)
 	y3.Mul(y3, m)
 	y3.Sub(y3, y1)
-	mod(y3)
+	modCoordinate(y3)
 }

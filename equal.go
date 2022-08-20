@@ -50,11 +50,11 @@ func EqualJacobi(
 
 	// u1 = x1 * z2²
 	u1 := new(big.Int).Mul(x1, z2_pow2)
-	mod(u1)
+	modCoordinate(u1)
 
 	// u2 = x2 * z1²
 	u2 := new(big.Int).Mul(x2, z1_pow2)
-	mod(u2)
+	modCoordinate(u2)
 
 	// Ax1 != Ax2
 	if !equal(u1, u2) {
@@ -72,12 +72,12 @@ func EqualJacobi(
 	// s1 = y1 * z2³
 	s1 := z2_pow3.Mul(y1, z2_pow3)
 	z2_pow3 = nil
-	mod(s1)
+	modCoordinate(s1)
 
 	// s2 = y2 * z1³
 	s2 := z1_pow3.Mul(y2, z1_pow3)
 	z1_pow3 = nil
-	mod(s2)
+	modCoordinate(s2)
 
 	return equal(s1, s2)
 }
