@@ -33,16 +33,11 @@ func TestWeierstrass_NotOnCurve(t *testing.T) {
 	}
 
 	for _, x := range invalidXs {
-		func() {
-			defer func() {
-				panicValue := recover()
-				if panicValue == nil {
-					t.Errorf("expected panic when calling Weierstrass on invalid x value: '%.64x'", x)
-				}
-			}()
-
-			Weierstrass(x)
-		}()
+		evenY, oddY := Weierstrass(x)
+		if evenY != nil || oddY != nil {
+			t.Errorf("expected Weierstrass on invalid x value to return nil: '%.64x'", x)
+			return
+		}
 	}
 }
 
