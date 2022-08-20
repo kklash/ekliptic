@@ -11,9 +11,9 @@ func SignECDSA(
 	d, k, z *big.Int,
 	r, s *big.Int,
 ) {
-	if k.Cmp(Secp256k1_CurveOrder) >= 0 || k.Cmp(one) == -1 {
+	if !IsValidScalar(k) {
 		panic("SignECDSA: expected nonce k to be in range [1, Secp256k1_CurveOrder)")
-	} else if d.Cmp(Secp256k1_CurveOrder) >= 0 || d.Cmp(one) == -1 {
+	} else if !IsValidScalar(d) {
 		panic("SignECDSA: expected private key d to be in range [1, Secp256k1_CurveOrder)")
 	}
 
