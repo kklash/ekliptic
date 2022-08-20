@@ -27,7 +27,7 @@ func TestWeierstrass_NotOnCurve(t *testing.T) {
 	invalidXs := []*big.Int{
 		hexint("b906eae4400782607f482c77b0c3c8e049577d8c1ff0779374818a3a2f5a3a34"),
 		hexint("4323d9bc9c1c255f256e6549828aa2e40052325cd5eb277f5836d8a5713aac1d"),
-		big.NewInt(0),
+		big.NewInt(-1),
 		Secp256k1_P,
 		new(big.Int).Add(Secp256k1_P, one),
 	}
@@ -38,6 +38,12 @@ func TestWeierstrass_NotOnCurve(t *testing.T) {
 			t.Errorf("expected Weierstrass on invalid x value to return nil: '%.64x'", x)
 			return
 		}
+	}
+
+	evenY, oddY := Weierstrass(zero)
+	if !equal(evenY, zero) || !equal(oddY, zero) {
+		t.Errorf("expected Weierstrass of zero to return zero")
+		return
 	}
 }
 

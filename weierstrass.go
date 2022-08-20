@@ -4,18 +4,23 @@ import (
 	"math/big"
 )
 
-// Weierstrass solves the Weierstrass form elliptic curve equation for y, given an affine value of x:
+// Weierstrass solves the Weierstrass form elliptic curve equation for y,
+// given an affine value of x:
 //  y² = x³ + ax + b mod P
 // ...where a = 0, b = 7 and P is Secp256k1_P - the secp256k1 curve constants.
 //
-// It returns the two possible values of y: an even value and an odd value. You could also call this function "GetYValues(x)".
-// This is useful for uncompressing public keys, which in secp256k1 often supply only the-x coordinate, and maybe a specifier
-// indicating whether the y-coordinate is even or odd.
+// It returns the two possible values of y: an even value and an odd value. You could also
+// call this function "GetYValues(x)". This is useful for uncompressing public keys, which
+// in secp256k1 often supply only the-x coordinate, and maybe a specifier indicating whether
+// the y-coordinate is even or odd.
 //
 // Returns two nil values if x is not a valid coordinate on the secp256k1 curve.
+// Returns two zero values if x is zero.
 func Weierstrass(x *big.Int) (evenY, oddY *big.Int) {
-	if x.Cmp(Secp256k1_P) >= 0 {
-		// x is larger than curve modulus P; point would not be on the curve
+	// if x is not positive, or is larger than curve modulus P, point would not be on the curve.
+	if equal(x, zero) {
+		return new(big.Int).Set(zero), new(big.Int).Set(zero)
+	} else if x.Cmp(zero) == -1 || x.Cmp(Secp256k1_P) >= 0 {
 		return nil, nil
 	}
 
