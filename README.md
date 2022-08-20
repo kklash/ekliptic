@@ -40,7 +40,7 @@ func BenchmarkGenerateKeys_Ekliptic(b *testing.B) {
   var privateKey *big.Int
   var publicKey struct{ x, y big.Int }
   for i := 0; i < b.N; i++ {
-    privateKey, _ = ekliptic.NewPrivateKey(rand.Reader)
+    privateKey, _ = ekliptic.RandomScalar(rand.Reader)
     ekliptic.MultiplyBasePoint(privateKey, &publicKey.x, &publicKey.y)
   }
 }
@@ -128,7 +128,7 @@ import (
 
 randReader := mathrand.New(mathrand.NewSource(1))
 
-key, _ := ekliptic.NewPrivateKey(randReader)
+key, _ := ekliptic.RandomScalar(randReader)
 
 // This could also come from RFC6979 (github.com/kklash/rfc6979)
 nonce, _ := cryptorand.Int(randReader, ekliptic.Secp256k1_CurveOrder)

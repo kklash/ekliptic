@@ -68,7 +68,7 @@ func ExampleMultiplyAffine() {
 func ExampleSignECDSA() {
 	randReader := mathrand.New(mathrand.NewSource(1))
 
-	key, _ := ekliptic.NewPrivateKey(randReader)
+	key, _ := ekliptic.RandomScalar(randReader)
 
 	// This could also come from RFC6979 (github.com/kklash/rfc6979)
 	nonce, _ := cryptorand.Int(randReader, ekliptic.Secp256k1_CurveOrder)
