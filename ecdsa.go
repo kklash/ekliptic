@@ -30,7 +30,7 @@ func SignECDSA(
 	x = nil
 
 	// s = k⁻¹ * m mod N
-	s.ModInverse(k, Secp256k1_CurveOrder)
+	s.Set(InvertScalar(k))
 	s.Mul(s, m)
 	s.Mod(s, Secp256k1_CurveOrder)
 
@@ -51,7 +51,7 @@ func VerifyECDSA(
 	r, s *big.Int,
 	pubX, pubY *big.Int,
 ) bool {
-	sInverse := new(big.Int).ModInverse(s, Secp256k1_CurveOrder)
+	sInverse := InvertScalar(s)
 
 	// u1 = s⁻¹ * z mod N
 	u1 := new(big.Int).Mul(sInverse, z)

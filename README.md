@@ -216,6 +216,54 @@ if ecdsa.Verify(&key.PublicKey, hashedMessage[:], r, s) {
 // verified ECDSA signature using crypto/ecdsa
 ```
 
+Blinding a hidden value for multi-party computation:
+
+```go
+// Alice: input parameters
+s, _ := new(big.Int).SetString("2fc9374cad648e33f78dd294578dd960281e05744b27faa1ffe1e7175bd6901d", 16)
+aX, _ := new(big.Int).SetString("8bf20851cc16007dbf3df0c109dc016b360ca0f729f368ea38c385ceeffaf3cf", 16)
+aY, _ := new(big.Int).SetString("a0c7bd73154c02cc5e002c3a4f876158a4276c185ef859df589675a92c745e3a", 16)
+
+// Bob: input parameters
+r, _ := new(big.Int).SetString("825e7984ae7843f9c13371d9a54143a465b1e2d278e67de1ca713127e40a52f1", 16)
+
+// Alice: blind the input with secret s send the result B to Bob.
+// B = s * A
+bX := new(big.Int)
+bY := new(big.Int)
+ekliptic.MultiplyAffine(aX, aY, s, bX, bY, nil)
+
+// Bob: receive A, blind it again with secret r and return result C to Alice.
+// C = r * B = r * s * G
+cX := new(big.Int)
+cY := new(big.Int)
+ekliptic.MultiplyAffine(bX, bY, r, cX, cY, nil)
+
+// Alice: unblind C with the inverse of s:
+// s⁻¹ * C = s⁻¹ * r * s * G = r * G
+sInv := ekliptic.InvertScalar(s)
+
+mX := new(big.Int)
+mY := new(big.Int)
+ekliptic.MultiplyAffine(cX, cY, sInv, mX, mY, nil)
+
+// Alice now knows r * A without knowing r, having revealed neither A nor the final result M to Bob.
+
+expectedX := new(big.Int)
+expectedY := new(big.Int)
+ekliptic.MultiplyAffine(aX, aY, r, expectedX, expectedY, nil)
+
+if !ekliptic.EqualAffine(mX, mY, expectedX, expectedY) {
+  fmt.Println("did not find expected unblinded point")
+  return
+}
+
+fmt.Println("found correct unblinded point q * h * G")
+
+// output:
+// found correct unblinded point q * h * G
+```
+
 ## Hacking on Ekliptic
 
 | Command | Usage |
