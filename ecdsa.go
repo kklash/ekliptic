@@ -3,14 +3,11 @@ package ekliptic
 import "math/big"
 
 // SignECDSA signs a message hash z using the private key d, and a random (or deterministically
-// derived) nonce k. It sets r and s to the resulting signature parts.
+// derived) nonce k. It returns the resulting signature parts r and s.
 //
 // Both the nonce k and the private key d should be generated with equal probability distribution
-// over the range [1, Secp256k1_CurveOrder). SignECDSA Panics if k or d is not within this range.
-func SignECDSA(
-	d, k, z *big.Int,
-	r, s *big.Int,
-) {
+// over the range [1, Secp256k1_CurveOrder). SignECDSA panics if k or d is not within this range.
+func SignECDSA(d, k, z *big.Int) (r, s *big.Int) {
 	if !IsValidScalar(k) {
 		panic("SignECDSA: expected nonce k to be in range [1, Secp256k1_CurveOrder)")
 	} else if !IsValidScalar(d) {
@@ -18,11 +15,10 @@ func SignECDSA(
 	}
 
 	// (x, _) = k * G
-	x := new(big.Int)
-	MultiplyBasePoint(k, x, new(big.Int))
+	x, _ := MultiplyBasePoint(k)
 
 	// r = x mod N
-	r.Mod(x, Secp256k1_CurveOrder)
+	r = new(big.Int).Mod(x, Secp256k1_CurveOrder)
 
 	// m = rd + z
 	m := x.Mul(r, d)
@@ -30,7 +26,7 @@ func SignECDSA(
 	x = nil
 
 	// s = k⁻¹ * m mod N
-	s.Set(InvertScalar(k))
+	s = InvertScalar(k)
 	s.Mul(s, m)
 	s.Mod(s, Secp256k1_CurveOrder)
 
@@ -41,6 +37,7 @@ func SignECDSA(
 	if s.Cmp(Secp256k1_CurveOrderHalf) == 1 {
 		s.Sub(Secp256k1_CurveOrder, s)
 	}
+	return
 }
 
 // VerifyECDSA returns true if the given signature (r, s) is a valid signature on message hash z
@@ -63,17 +60,11 @@ func VerifyECDSA(
 	sInverse = nil
 
 	// u1G = G * u1
-	u1Gx := u1
-	u1Gy := new(big.Int)
-	MultiplyBasePoint(u1, u1Gx, u1Gy)
-	u1 = nil
+	u1Gx, u1Gy := MultiplyBasePoint(u1)
 
 	// H = (pubX, pubY)
 	// u2H = H * u2
-	u2Hx := u2
-	u2Hy := new(big.Int)
-	MultiplyAffine(pubX, pubY, u2, u2Hx, u2Hy, nil)
-	u2 = nil
+	u2Hx, u2Hy := MultiplyAffine(pubX, pubY, u2, nil)
 
 	// P = u1G + u2H
 	// px = x(p) mod N

@@ -51,27 +51,19 @@ func (_ *Curve) Double(x1, y1 *big.Int) (x3, y3 *big.Int) {
 	return
 }
 
-// ScalarMult returns k*(Bx,By) where k is a number in big-endian form.
+// ScalarMult returns k*(x1,y1) where k is a number in big-endian form.
 // Satisfies elliptic.Curve.
 func (_ *Curve) ScalarMult(x1, y1 *big.Int, k []byte) (x2, y2 *big.Int) {
-	x2 = new(big.Int)
-	y2 = new(big.Int)
 	kBig := new(big.Int).SetBytes(k)
 
 	if equal(x1, Secp256k1_GeneratorX) && equal(y1, Secp256k1_GeneratorY) {
-		MultiplyBasePoint(kBig, x2, y2)
-	} else {
-		MultiplyAffine(x1, y1, kBig, x2, y2, nil)
+		return MultiplyBasePoint(kBig)
 	}
-	return
+	return MultiplyAffine(x1, y1, kBig, nil)
 }
 
 // ScalarBaseMult returns k*G, where G is the base point of the group
 // and k is an integer in big-endian form. Satisfies elliptic.Curve.
 func (_ *Curve) ScalarBaseMult(k []byte) (x2, y2 *big.Int) {
-	x2 = new(big.Int)
-	y2 = new(big.Int)
-	kBig := new(big.Int).SetBytes(k)
-	MultiplyBasePoint(kBig, x2, y2)
-	return
+	return MultiplyBasePoint(new(big.Int).SetBytes(k))
 }

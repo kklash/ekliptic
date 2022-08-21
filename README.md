@@ -71,10 +71,7 @@ Deriving a public key from a private key:
 
 ```go
 privateKey, _ := new(big.Int).SetString("c370af8c091812ef7f6bfaffb494b1046fb25486c9873243b80826daef3ec583", 16)
-x := new(big.Int)
-y := new(big.Int)
-
-ekliptic.MultiplyBasePoint(privateKey, x, y)
+x, y := ekliptic.MultiplyBasePoint(privateKey)
 
 fmt.Println("Public key:")
 fmt.Printf(" x: %x\n", x)
@@ -92,21 +89,17 @@ Deriving a Diffie-Hellman shared-secret:
 alicePriv, _ := new(big.Int).SetString("94a22a406a6977c1a323f23b9d7678ad08e822834d1df8adece84e30f0c25b6b", 16)
 bobPriv, _ := new(big.Int).SetString("55ba19100104cbd2842999826e99e478efe6883ac3f3a0c7571034321e0595cf", 16)
 
-var alicePub, bobPub struct{ x, y big.Int }
+var alicePub, bobPub struct{ x, y *big.Int }
 
 // derive public keys
-ekliptic.MultiplyBasePoint(alicePriv, &alicePub.x, &alicePub.y)
-ekliptic.MultiplyBasePoint(bobPriv, &bobPub.x, &bobPub.y)
-
-var yValueIsUnused big.Int
+alicePub.x, alicePub.y = ekliptic.MultiplyBasePoint(alicePriv)
+bobPub.x, bobPub.y = ekliptic.MultiplyBasePoint(bobPriv)
 
 // Alice gives Bob her public key, Bob derives the secret
-bobSharedKey := new(big.Int)
-ekliptic.MultiplyAffine(&alicePub.x, &alicePub.y, bobPriv, bobSharedKey, &yValueIsUnused, nil)
+bobSharedKey, _ := ekliptic.MultiplyAffine(alicePub.x, alicePub.y, bobPriv, nil)
 
 // Bob gives Alice his public key, Alice derives the secret
-aliceSharedKey := new(big.Int)
-ekliptic.MultiplyAffine(&bobPub.x, &bobPub.y, alicePriv, aliceSharedKey, &yValueIsUnused, nil)
+aliceSharedKey, _ := ekliptic.MultiplyAffine(bobPub.x, bobPub.y, alicePriv, nil)
 
 fmt.Printf("Alice's derived secret: %x\n", aliceSharedKey)
 fmt.Printf("Bob's derived secret:   %x\n", bobSharedKey)
@@ -136,21 +129,15 @@ nonce, _ := cryptorand.Int(randReader, ekliptic.Secp256k1_CurveOrder)
 hashedMessage := sha256.Sum256([]byte("i love you"))
 hashedMessageInt := new(big.Int).SetBytes(hashedMessage[:])
 
-r := new(big.Int)
-s := new(big.Int)
-
-ekliptic.SignECDSA(
-  key, nonce, hashedMessageInt,
-  r, s,
-)
+r, s := ekliptic.SignECDSA(key, nonce, hashedMessageInt)
 
 fmt.Printf("r: %x\n", r)
 fmt.Printf("s: %x\n", s)
 
-var pub struct{ x, y big.Int }
-ekliptic.MultiplyBasePoint(key, &pub.x, &pub.y)
+var pub struct{ x, y *big.Int }
+pub.x, pub.y = ekliptic.MultiplyBasePoint(key)
 
-valid := ekliptic.VerifyECDSA(hashedMessageInt, r, s, &pub.x, &pub.y)
+valid := ekliptic.VerifyECDSA(hashedMessageInt, r, s, pub.x, pub.y)
 fmt.Printf("valid: %v\n", valid)
 
 // output:
@@ -189,17 +176,15 @@ Ekliptic exports a struct type `Curve`, which satisfies the `elliptic.Curve` int
 
 ```go
 d, _ := new(big.Int).SetString("18e14a7b6a307f426a94f8114701e7c8e774e7f9a47e2c2035db29a206321725", 16)
+pubX, pubY := ekliptic.MultiplyBasePoint(d)
 key := &ecdsa.PrivateKey{
   D: d,
   PublicKey: ecdsa.PublicKey{
     Curve: new(ekliptic.Curve),
-    X:     new(big.Int),
-    Y:     new(big.Int),
+    X:     pubX,
+    Y:     pubY,
   },
 }
-
-// Compute the public key
-ekliptic.MultiplyBasePoint(key.D, key.X, key.Y)
 
 hashedMessage := sha256.Sum256([]byte("i love you"))
 
@@ -229,29 +214,19 @@ r, _ := new(big.Int).SetString("825e7984ae7843f9c13371d9a54143a465b1e2d278e67de1
 
 // Alice: blind the input with secret s send the result B to Bob.
 // B = s * A
-bX := new(big.Int)
-bY := new(big.Int)
-ekliptic.MultiplyAffine(aX, aY, s, bX, bY, nil)
+bX, bY := ekliptic.MultiplyAffine(aX, aY, s, nil)
 
 // Bob: receive A, blind it again with secret r and return result C to Alice.
 // C = r * B = r * s * G
-cX := new(big.Int)
-cY := new(big.Int)
-ekliptic.MultiplyAffine(bX, bY, r, cX, cY, nil)
+cX, cY := ekliptic.MultiplyAffine(bX, bY, r, nil)
 
 // Alice: unblind C with the inverse of s:
 // s⁻¹ * C = s⁻¹ * r * s * G = r * G
 sInv := ekliptic.InvertScalar(s)
 
-mX := new(big.Int)
-mY := new(big.Int)
-ekliptic.MultiplyAffine(cX, cY, sInv, mX, mY, nil)
+mX, mY := ekliptic.MultiplyAffine(cX, cY, sInv, nil)
 
-// Alice now knows r * A without knowing r, having revealed neither A nor the final result M to Bob.
-
-expectedX := new(big.Int)
-expectedY := new(big.Int)
-ekliptic.MultiplyAffine(aX, aY, r, expectedX, expectedY, nil)
+expectedX, expectedY := ekliptic.MultiplyAffine(aX, aY, r, nil)
 
 if !ekliptic.EqualAffine(mX, mY, expectedX, expectedY) {
   fmt.Println("did not find expected unblinded point")
@@ -287,7 +262,7 @@ Test vectors stored in [`test_vectors`](./test_vectors) can be verified using th
 
 ### Memory
 
-All methods use and accept golang-native `big.Int` structs for math operations. In most cases we require the caller to pass pointers in which results will be stored.
+All methods use and accept golang-native `big.Int` structs for math operations. In some cases we require the caller to pass pointers in which results will be stored.
 
 ```go
 x := new(big.Int).SetString("3e61e957cb7eb9252155722d37056b581cacd9949cd7daeba682d81ee829826d", 16)

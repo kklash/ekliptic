@@ -6,7 +6,6 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"encoding/hex"
-	"math/big"
 	"testing"
 
 	"github.com/kklash/ekliptic/test_vectors"
@@ -21,14 +20,13 @@ func TestCurve(t *testing.T) {
 				D: vector.PrivateKey,
 				PublicKey: ecdsa.PublicKey{
 					Curve: curve,
-					X:     new(big.Int),
-					Y:     new(big.Int),
+					X:     nil,
+					Y:     nil,
 				},
 			}
-			MultiplyBasePoint(key.D, key.X, key.Y)
+			key.X, key.Y = MultiplyBasePoint(key.D)
 
-			hash := make([]byte, 32)
-			vector.Hash.FillBytes(hash)
+			hash := vector.Hash.FillBytes(make([]byte, 32))
 
 			r, s, err := ecdsa.Sign(rand.Reader, key, hash)
 			if err != nil {

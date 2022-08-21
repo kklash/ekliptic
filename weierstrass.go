@@ -43,11 +43,7 @@ func Weierstrass(x *big.Int) (evenY, oddY *big.Int) {
 
 	// if y is even, -y is odd, and vice-versa.
 	evenY = y
-	oddY = ySquared.Set(y)
-	Negate(oddY)
-
-	y = nil
-	ySquared = nil
+	oddY = Negate(y)
 
 	if !isEven(evenY) {
 		evenY, oddY = oddY, evenY

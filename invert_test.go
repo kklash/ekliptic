@@ -2,7 +2,6 @@ package ekliptic
 
 import (
 	"crypto/rand"
-	"math/big"
 	"testing"
 )
 
@@ -14,13 +13,8 @@ func TestInvertScalar(t *testing.T) {
 			return
 		}
 
-		x := new(big.Int)
-		y := new(big.Int)
-		MultiplyBasePoint(r, x, y)
-
-		rInv := InvertScalar(r)
-
-		MultiplyAffine(x, y, rInv, x, y, nil)
+		x, y := MultiplyBasePoint(r)
+		x, y = MultiplyAffine(x, y, InvertScalar(r), nil)
 
 		if !EqualAffine(x, y, Secp256k1_GeneratorX, Secp256k1_GeneratorY) {
 			t.Errorf("expected to get generator point back after multiplying public key by inverse private key")

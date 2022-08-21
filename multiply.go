@@ -9,7 +9,7 @@ import (
 //  P2 = P1 * k
 //  P2 = (P1 * 2^0) + (P1 * 2^1) + (P1 * 2^2) + (P1 * 2^3) ...
 //
-// It stores the resulting Jacobian point in (x2, y2, z2).
+// It returns the resulting Jacobian point (x2, y2, z2).
 //
 // You can pass compute and then pass PrecomputedDoubles which massively boosts performance of successive MultiplyJacobi
 // calls, at the cost of a larger up-front computational investment. If you plan to multiply the same point more than
@@ -20,29 +20,23 @@ import (
 func MultiplyJacobi(
 	x1, y1, z1 *big.Int,
 	k *big.Int,
-	x2, y2, z2 *big.Int,
 	precomputedDoubles PrecomputedDoubles,
-) {
+) (x2, y2, z2 *big.Int) {
 	if !IsOnCurveJacobi(x1, y1, z1) {
 		panic("MultiplyJacobi: refusing to multiply point not on the curve; this could leak private data")
-	}
-
-	// save the bits ahead of time in case k points to the same int as one of the outputs.
-	kBits := make([]bool, k.BitLen())
-	for i := range kBits {
-		kBits[i] = k.Bit(i) > 0
 	}
 
 	doubleX := new(big.Int).Set(x1)
 	doubleY := new(big.Int).Set(y1)
 	doubleZ := new(big.Int).Set(z1)
 
-	x2.Set(zero)
-	y2.Set(zero)
-	z2.Set(zero)
+	x2 = new(big.Int).Set(zero)
+	y2 = new(big.Int).Set(zero)
+	z2 = new(big.Int).Set(zero)
 
-	for i, shouldAdd := range kBits {
-		if shouldAdd {
+	bitSize := k.BitLen()
+	for i := 0; i < bitSize; i++ {
+		if k.Bit(i) > 0 {
 			AddJacobi(
 				x2, y2, z2,
 				doubleX, doubleY, doubleZ,
@@ -54,19 +48,22 @@ func MultiplyJacobi(
 			doubleX.Set(precomputedDoubles[i+1][0])
 			doubleY.Set(precomputedDoubles[i+1][1])
 			doubleZ.Set(one)
-		} else {
+		} else if i+1 < bitSize {
 			DoubleJacobi(
 				doubleX, doubleY, doubleZ,
 				doubleX, doubleY, doubleZ,
 			)
 		}
 	}
+	return
 }
 
 // MultiplyAffine multiplies the given affine point by the scalar value k, using the double-and-add algorithm:
 //
 //  P2 = P1 * k
 //  P2 = (P1 * 2^0) + (P1 * 2^1) + (P1 * 2^2) + (P1 * 2^3) ...
+//
+// Returns the point P2 = (x2, y2)
 //
 // You can pass it a PrecomputedDoubles struct which massively boosts performance at the cost of
 // a larger up-front computational investment. If you plan to multiply the same point more than
@@ -76,19 +73,16 @@ func MultiplyJacobi(
 func MultiplyAffine(
 	x1, y1 *big.Int,
 	k *big.Int,
-	x2, y2 *big.Int,
 	precomputedDoubles PrecomputedDoubles,
-) {
-	z := new(big.Int).Set(one)
-
-	MultiplyJacobi(
-		x1, y1, z,
+) (x2, y2 *big.Int) {
+	x2, y2, z2 := MultiplyJacobi(
+		x1, y1, one,
 		k,
-		x2, y2, z,
 		precomputedDoubles,
 	)
 
-	ToAffine(x2, y2, z)
+	ToAffine(x2, y2, z2)
+	return
 }
 
 // MultiplyAffineNaive multiplies the given affine point by the scalar value k, using the double-and-add algorithm.
@@ -99,16 +93,16 @@ func MultiplyAffine(
 func MultiplyAffineNaive(
 	x1, y1 *big.Int,
 	k *big.Int,
-	x2, y2 *big.Int,
 	precomputedDoubles PrecomputedDoubles,
-) {
+) (x2, y2 *big.Int) {
 	doubleX := new(big.Int).Set(x1)
 	doubleY := new(big.Int).Set(y1)
 
-	x2.Set(zero)
-	y2.Set(zero)
+	x2 = new(big.Int).Set(zero)
+	y2 = new(big.Int).Set(zero)
 
-	for i := 0; i < k.BitLen(); i++ {
+	bitSize := k.BitLen()
+	for i := 0; i < bitSize; i++ {
 		if k.Bit(i) > 0 {
 			AddAffine(
 				x2, y2,
@@ -120,12 +114,12 @@ func MultiplyAffineNaive(
 		if i+1 < len(precomputedDoubles) {
 			doubleX.Set(precomputedDoubles[i+1][0])
 			doubleY.Set(precomputedDoubles[i+1][1])
-		} else {
+		} else if i+1 < bitSize {
 			DoubleAffine(
 				doubleX, doubleY,
 				doubleX, doubleY,
 			)
 		}
 	}
-
+	return
 }

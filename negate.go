@@ -2,14 +2,15 @@ package ekliptic
 
 import "math/big"
 
-// Negate sets the given Y-coordinate to its negative value, modulo P.
-// This can be used to negate a point, because:
+// Negate returns the additive inverse of the given Y-coordinate modulo the
+// curve prime modulus P. This can be used to negate a point, because:
 //
 //  (x, y) + (x, -y) = 0
 //
-// y is expected to be within range [0..P-1].
-func Negate(y *big.Int) {
-	if !equal(y, zero) {
-		y.Sub(Secp256k1_P, y)
+// y is expected to be within range [0, P-1].
+func Negate(y *big.Int) *big.Int {
+	if equal(y, zero) {
+		return new(big.Int).Set(zero)
 	}
+	return new(big.Int).Sub(Secp256k1_P, y)
 }
