@@ -1,6 +1,7 @@
 package ekliptic
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/kklash/ekliptic/test_vectors"
@@ -23,6 +24,39 @@ Wanted:
 	x: %.64x
 	y: %.64x
 `, i, resultX, resultY, vector.X2, vector.Y2)
+		}
+	}
+}
+
+func TestMultiplyJacobi_MemSafety(t *testing.T) {
+	// inputs and outputs are the same pointers
+	for i, vector := range test_vectors.AffineMultiplicationVectors {
+		originalX1 := new(big.Int).Set(vector.X1)
+		originalY1 := new(big.Int).Set(vector.Y1)
+
+		originalK := new(big.Int).Set(vector.K)
+
+		MultiplyJacobi(
+			vector.X1, vector.Y1, one,
+			vector.K,
+			nil,
+		)
+
+		if !equal(vector.X1, originalX1) || !equal(vector.Y1, originalY1) {
+			t.Errorf(`jacobi memory-safe multiplication failed for vector %d. Got:
+       x1: %.64x
+       y1: %.64x
+Wanted:
+       x1: %.64x
+       x1: %.64x
+`, i, vector.X1, vector.Y1, originalX1, originalY1)
+		}
+		if !equal(vector.K, originalK) {
+			t.Errorf(`jacobi memory safe multiplication failed for vector %d. Got:
+			 k: %.64x
+Wanted:
+			 k: %.64x
+`, i, vector.K, originalK)
 		}
 	}
 }
