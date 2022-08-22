@@ -9,7 +9,7 @@ import (
 //  P1 + P2 = P3
 //  (x1, y1, z1) + (x2, y2, z2) = (x3, y3, z3)
 //
-// It stores the resulting Jacobian point in x3, y3, and z3.
+// It returns the resulting Jacobian point (x3, y3, z3).
 //
 // We use the "add-1998-cmo-2" addition formulas.
 //
@@ -29,23 +29,25 @@ import (
 //  X3 = r²-HHH-2*V
 //  Y3 = r*(V-X3)-S1*HHH
 //  Z3 = Z1*Z2*H
+//
+// This function does not check point validity - it assumes you
+// are passing valid points on the secp256k1 curve.
 func AddJacobi(
-	x1, y1, z1 *big.Int, // P1
-	x2, y2, z2 *big.Int, // P2
-	x3, y3, z3 *big.Int, // P3
-) {
+	x1, y1, z1 *big.Int,
+	x2, y2, z2 *big.Int,
+) (x3, y3, z3 *big.Int) {
 	if equal(x1, zero) || equal(y1, zero) {
 		// P1 == 0: return P2
-		x3.Set(x2)
-		y3.Set(y2)
-		z3.Set(z2)
+		x3 = new(big.Int).Set(x2)
+		y3 = new(big.Int).Set(y2)
+		z3 = new(big.Int).Set(z2)
 		return
 	}
 	if equal(x2, zero) || equal(y2, zero) {
 		// P2 == 0: return P1
-		x3.Set(x1)
-		y3.Set(y1)
-		z3.Set(z1)
+		x3 = new(big.Int).Set(x1)
+		y3 = new(big.Int).Set(y1)
+		z3 = new(big.Int).Set(z1)
 		return
 	}
 
@@ -106,18 +108,14 @@ func AddJacobi(
 	if equal(h, zero) {
 		if equal(r, zero) {
 			// P1 == P2: return the doubled point
-			DoubleJacobi(
-				x1, y1, z1,
-				x3, y3, z3,
-			)
-			return
+			return DoubleJacobi(x1, y1, z1)
 		}
 
 		// P1 == -P2: sum will be zero
 		// INVARIANT: for performance, y2 is assumed to be negative y1
-		x3.Set(zero)
-		y3.Set(zero)
-		z3.Set(zero)
+		x3 = new(big.Int).Set(zero)
+		y3 = new(big.Int).Set(zero)
+		z3 = new(big.Int).Set(zero)
 		return
 	}
 
@@ -133,23 +131,26 @@ func AddJacobi(
 	hh = nil
 
 	// x3 = r² - h³ - 2*v
-	x3.Mul(r, r)
+	x3 = new(big.Int).Mul(r, r)
 	x3.Sub(x3, hhh)
 	x3.Sub(x3, v)
 	x3.Sub(x3, v)
 	modCoordinate(x3)
 
 	// y3 = r * (v - x3) - s1 * h³
-	y3.Sub(v, x3)
+	y3 = v.Sub(v, x3)
 	y3.Mul(r, y3)
 	y3.Sub(y3, s1.Mul(s1, hhh))
+	v = nil
 	s1 = nil
 	modCoordinate(y3)
 
 	// z3 = z1 * z2 * h
-	z3.Mul(z1, z2)
+	z3 = hhh.Mul(z1, z2)
 	z3.Mul(z3, h)
 	modCoordinate(z3)
+	hhh = nil
+	return
 }
 
 // AddAffine adds two affine points together:
@@ -157,7 +158,7 @@ func AddJacobi(
 //  P1 + P2 = P3
 //  (x1, y1) + (x2, y2) = (x3, y3)
 //
-// It stores the resulting affine point in x3, and y3.
+// It returns the resulting affine point (x3, y3).
 //
 // We incorporate the standard affine addition and doubling formulas:
 //
@@ -173,18 +174,17 @@ func AddJacobi(
 func AddAffine(
 	x1, y1 *big.Int,
 	x2, y2 *big.Int,
-	x3, y3 *big.Int,
-) {
+) (x3, y3 *big.Int) {
 	// P2 + 0 = P2
 	if EqualAffine(x1, y1, zero, zero) {
-		x3.Set(x2)
-		y3.Set(y2)
+		x3 = new(big.Int).Set(x2)
+		y3 = new(big.Int).Set(y2)
 		return
 	}
 	// P1 + 0 = P1
 	if EqualAffine(x2, y2, zero, zero) {
-		x3.Set(x1)
-		y3.Set(y1)
+		x3 = new(big.Int).Set(x1)
+		y3 = new(big.Int).Set(y1)
 		return
 	}
 
@@ -194,8 +194,8 @@ func AddAffine(
 	// INVARIANT: if x1 == x2 && y1 != y2, assume y1 = -y2 (the only other possible point on the curve).
 	// Thus P1 + P2 = 0
 	if xEqual && !yEqual {
-		x3.Set(zero)
-		y3.Set(zero)
+		x3 = new(big.Int).Set(zero)
+		y3 = new(big.Int).Set(zero)
 		return
 	}
 
@@ -218,30 +218,18 @@ func AddAffine(
 	}
 	modCoordinate(m)
 
-	// Memory-safety: if result pointers are also input parameter pointers, we don't want to
-	// modify P1 and P2 until we're done using them.
-	if x1 == x3 {
-		x1 = new(big.Int).Set(x1)
-	}
-	if x2 == x3 {
-		x2 = new(big.Int).Set(x2)
-	}
-	if y1 == y3 {
-		y1 = new(big.Int).Set(y1)
-	}
-	if y2 == y3 {
-		y2 = new(big.Int).Set(y2)
-	}
-
 	// x3 = m² - x1 - x2
-	x3.Mul(m, m)
+	x3 = buf.Mul(m, m)
 	x3.Sub(x3, x1)
 	x3.Sub(x3, x2)
 	modCoordinate(x3)
+	buf = nil
 
 	// y3 = m * (x1 - x3) - y1
-	y3.Sub(x1, x3)
+	y3 = new(big.Int).Sub(x1, x3)
 	y3.Mul(y3, m)
 	y3.Sub(y3, y1)
 	modCoordinate(y3)
+
+	return
 }

@@ -262,35 +262,7 @@ Test vectors stored in [`test_vectors`](./test_vectors) can be verified using th
 
 ### Memory
 
-All methods use and accept golang-native `big.Int` structs for math operations. In some cases we require the caller to pass pointers in which results will be stored.
-
-```go
-x := new(big.Int).SetString("3e61e957cb7eb9252155722d37056b581cacd9949cd7daeba682d81ee829826d", 16)
-y := new(big.Int).SetString("0c9b31d4b3f13c2dcec21b5d446a06cd655056d83495f63f05135ff4434e7ba5", 16)
-z := new(big.Int).SetString("4c4619154810c1c0daa4ddd8c73971d159db91705f2113ce51b9885e4578874d", 16)
-
-doubleX := new(big.Int)
-doubleY := new(big.Int)
-doubleZ := new(big.Int)
-
-ekliptic.DoubleJacobi(
-  x3, y3, z3,
-  doubleX, doubleY, doubleZ,
-)
-```
-
-While slightly more awkward to use, exposing this C-style API allows for better memory performance when doing large numbers of sequential operations. The garbage collector isn't doing as much work, because we don't have to keep re-allocating new `big.Int`s every time a call returns. We have some benchmarks for addition and doubling which demonstrate this method can save about 6 allocs/op, and a few hundred bytes of memory for every call involving Jacobian points.
-
-You can even safely pass the input pointers as the output pointers, to modify them in place.
-
-```go
-ekliptic.DoubleJacobi(
-  x3, y3, z3,
-  x3, y3, z3,
-)
-```
-
-`big.Int` structs can be re-used when the values they hold are no longer required. This is why you'll see patterns like this if you read Ekliptic's code:
+All methods use and accept golang-native `big.Int` structs for math operations. `big.Int` structs can be re-used when the values they hold are no longer required. This is why you'll see patterns like this if you read Ekliptic's code:
 
 ```go
 e := a.Mul(a, three)

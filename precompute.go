@@ -22,7 +22,7 @@ func ComputePointDoubles(genX, genY *big.Int) PrecomputedDoubles {
 			new(big.Int).Set(x),
 			new(big.Int).Set(y),
 		}
-		DoubleJacobi(x, y, z, x, y, z)
+		x, y, z = DoubleJacobi(x, y, z)
 		ToAffine(x, y, z)
 	}
 

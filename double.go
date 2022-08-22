@@ -14,10 +14,7 @@ import "math/big"
 //  X3 = F-2*D
 //  Y3 = E*(D-X3)-8*C
 //  Z3 = 2*Y1*Z1
-func DoubleJacobi(
-	x1, y1, z1 *big.Int,
-	x3, y3, z3 *big.Int,
-) {
+func DoubleJacobi(x1, y1, z1 *big.Int) (x3, y3, z3 *big.Int) {
 	// a = x1²
 	a := new(big.Int).Mul(x1, x1)
 
@@ -52,32 +49,31 @@ func DoubleJacobi(
 	f := new(big.Int).Mul(e, e)
 
 	// x3 = f - 2 * d
-	x3.Mul(d, two)
-	x3.Sub(f, x3)
+	x3 = f.Sub(f, d)
+	x3.Sub(x3, d)
 	modCoordinate(x3)
-
-	// z3 = 2 * y1 * z1
-	z3.Mul(y1, z1)
-	z3.Mul(z3, two)
-	modCoordinate(z3)
-
-	// *** Ensure y3 is set AFTER z3. If y3 points to the same bigint  ***
-	// *** as y1, this will mutate y1, which is needed to calculate z3 ***
+	f = nil
 
 	// y3 = e * (d - x3) - 8 * c
-	y3.Sub(d, x3)
+	y3 = d.Sub(d, x3)
 	y3.Mul(y3, e)
 	y3.Sub(y3, c.Mul(c, eight))
-	c = nil
 	modCoordinate(y3)
+	c = nil
+	d = nil
+
+	// z3 = 2 * y1 * z1
+	z3 = e.Mul(y1, z1)
+	z3.Mul(z3, two)
+	modCoordinate(z3)
+	e = nil
+
+	return
 }
 
 //  m = (3*x1²+a) / (2*y1)
 //  x3 = m² - x1 - x2
 //  y3 = m(x1-x3) - y1
-func DoubleAffine(
-	x1, y1 *big.Int,
-	x3, y3 *big.Int,
-) {
-	AddAffine(x1, y1, x1, y1, x3, y3)
+func DoubleAffine(x1, y1 *big.Int) (x3, y3 *big.Int) {
+	return AddAffine(x1, y1, x1, y1)
 }

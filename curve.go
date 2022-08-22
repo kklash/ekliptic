@@ -35,20 +35,14 @@ func (_ *Curve) IsOnCurve(x, y *big.Int) bool {
 	return IsOnCurveAffine(x, y)
 }
 
-// Add returns the sum of (x1,y1) and (x2,y2) satisfies elliptic.Curve.
+// Add returns the sum of (x1,y1) and (x2,y2). Satisfies elliptic.Curve.
 func (_ *Curve) Add(x1, y1, x2, y2 *big.Int) (x3, y3 *big.Int) {
-	x3 = new(big.Int)
-	y3 = new(big.Int)
-	AddAffine(x1, y1, x2, y2, x3, y3)
-	return
+	return AddAffine(x1, y1, x2, y2)
 }
 
-// Double returns 2*(x,y). Satisfies elliptic.Curve.
+// Double returns 2*(x1,y1). Satisfies elliptic.Curve.
 func (_ *Curve) Double(x1, y1 *big.Int) (x3, y3 *big.Int) {
-	x3 = new(big.Int)
-	y3 = new(big.Int)
-	DoubleAffine(x1, y1, x3, y3)
-	return
+	return DoubleAffine(x1, y1)
 }
 
 // ScalarMult returns k*(x1,y1) where k is a number in big-endian form.

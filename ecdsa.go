@@ -67,12 +67,9 @@ func VerifyECDSA(
 	u2Hx, u2Hy := MultiplyAffine(pubX, pubY, u2, nil)
 
 	// P = u1G + u2H
-	// px = x(p) mod N
-	px := u1Gx
-	AddAffine(u1Gx, u1Gy, u2Hx, u2Hy, px, u1Gy)
+	// px = x(P) mod N
+	px, _ := AddAffine(u1Gx, u1Gy, u2Hx, u2Hy)
 	px.Mod(px, Secp256k1_CurveOrder)
-	u1Gx = nil
-	u1Gy = nil
 
 	return equal(r, px)
 }

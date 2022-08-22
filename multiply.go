@@ -37,10 +37,9 @@ func MultiplyJacobi(
 	bitSize := k.BitLen()
 	for i := 0; i < bitSize; i++ {
 		if k.Bit(i) > 0 {
-			AddJacobi(
+			x2, y2, z2 = AddJacobi(
 				x2, y2, z2,
 				doubleX, doubleY, doubleZ,
-				x2, y2, z2,
 			)
 		}
 
@@ -49,10 +48,7 @@ func MultiplyJacobi(
 			doubleY.Set(precomputedDoubles[i+1][1])
 			doubleZ.Set(one)
 		} else if i+1 < bitSize {
-			DoubleJacobi(
-				doubleX, doubleY, doubleZ,
-				doubleX, doubleY, doubleZ,
-			)
+			doubleX, doubleY, doubleZ = DoubleJacobi(doubleX, doubleY, doubleZ)
 		}
 	}
 	return
@@ -104,10 +100,9 @@ func MultiplyAffineNaive(
 	bitSize := k.BitLen()
 	for i := 0; i < bitSize; i++ {
 		if k.Bit(i) > 0 {
-			AddAffine(
+			x2, y2 = AddAffine(
 				x2, y2,
 				doubleX, doubleY,
-				x2, y2,
 			)
 		}
 
@@ -115,10 +110,7 @@ func MultiplyAffineNaive(
 			doubleX.Set(precomputedDoubles[i+1][0])
 			doubleY.Set(precomputedDoubles[i+1][1])
 		} else if i+1 < bitSize {
-			DoubleAffine(
-				doubleX, doubleY,
-				doubleX, doubleY,
-			)
+			doubleX, doubleY = DoubleAffine(doubleX, doubleY)
 		}
 	}
 	return
