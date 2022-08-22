@@ -295,7 +295,7 @@ BenchmarkMultiplyAffineNaive-6                 442     2480711 ns/op    545915 B
 
 ### Precomputation
 
-You can improve multiplication performance even more by using precomputed doubles of the secp256k1 base-point. Precomputing $2^iG$ for $0 <= i <= 255$ significantly boosts performance for base-point [double-and-add multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Double-and-add), especially if [the precomputed doubles are saved in affine form](./precomputed_doubles.go). Values are computed using the `ekliptic.ComputePointDoubles` function, [triggered by `go generate`](./genprecompute).
+You can improve multiplication performance even more by using precomputed doubles of the point being multiplied. For the heavily used basepoint $G$, precomputing $2^iG$ for $0 <= i <= 255$ significantly boosts performance for base-point [double-and-add multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Double-and-add), especially if [the precomputed doubles are saved in affine form](./precomputed_doubles.go). Values are computed using the `ekliptic.ComputePointDoubles` function, [triggered by `go generate`](./genprecompute).
 
 ### Other Performance Notes
 
