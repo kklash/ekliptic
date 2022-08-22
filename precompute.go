@@ -15,15 +15,13 @@ func ComputePointDoubles(genX, genY *big.Int) PrecomputedDoubles {
 
 	x := new(big.Int).Set(genX)
 	y := new(big.Int).Set(genY)
-	z := new(big.Int).Set(one)
 
 	for i := 0; i < len(precomputedBasePointDoubles); i++ {
 		precomputedBasePointDoubles[i] = [2]*big.Int{
 			new(big.Int).Set(x),
 			new(big.Int).Set(y),
 		}
-		x, y, z = DoubleJacobi(x, y, z)
-		ToAffine(x, y, z)
+		x, y = DoubleAffine(x, y)
 	}
 
 	return precomputedBasePointDoubles
