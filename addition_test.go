@@ -69,6 +69,32 @@ Wanted:
 	}
 }
 
+func TestSubJacobi(t *testing.T) {
+	for i, vector := range test_vectors.JacobiAdditionVectors {
+		x1, y1, z1 := SubJacobi(
+			vector.X3, vector.Y3, vector.Z3,
+			vector.X2, vector.Y2, vector.Z2,
+		)
+
+		if !EqualJacobi(x1, y1, z1, vector.X1, vector.Y1, vector.Z1) {
+			ToAffine(x1, y1, z1)
+
+			expectedX1 := new(big.Int).Set(vector.X1)
+			expectedY1 := new(big.Int).Set(vector.Y1)
+			expectedZ1 := new(big.Int).Set(vector.Z1)
+			ToAffine(expectedX1, expectedY1, expectedZ1)
+
+			t.Errorf(`jacobi point subtraction failed for vector %d - Got affine points:
+	x1: %.64x
+	y1: %.64x
+Wanted:
+	x1: %.64x
+	y1: %.64x
+`, i, x1, y1, expectedX1, expectedY1)
+		}
+	}
+}
+
 func TestAddAffine(t *testing.T) {
 	for i, vector := range test_vectors.JacobiAdditionVectors {
 		x1 := new(big.Int).Set(vector.X1)
@@ -141,6 +167,36 @@ Wanted:
 	x2: %.64x
 	y2: %.64x
 `, i, x2, y2, originalX2, originalY2)
+		}
+	}
+}
+
+func TestSubAffine(t *testing.T) {
+	for i, vector := range test_vectors.JacobiAdditionVectors {
+		x3 := new(big.Int).Set(vector.X3)
+		y3 := new(big.Int).Set(vector.Y3)
+		z3 := new(big.Int).Set(vector.Z3)
+		x2 := new(big.Int).Set(vector.X2)
+		y2 := new(big.Int).Set(vector.Y2)
+		z2 := new(big.Int).Set(vector.Z2)
+		expectedX1 := new(big.Int).Set(vector.X1)
+		expectedY1 := new(big.Int).Set(vector.Y1)
+		expectedZ1 := new(big.Int).Set(vector.Z1)
+
+		ToAffine(x3, y3, z3)
+		ToAffine(x2, y2, z2)
+		ToAffine(expectedX1, expectedY1, expectedZ1)
+
+		x1, y1 := SubAffine(x3, y3, x2, y2)
+
+		if !EqualAffine(x1, y1, expectedX1, expectedY1) {
+			t.Errorf(`affine point addition failed for vector %d - Got:
+	x3: %.64x
+	y3: %.64x
+Wanted:
+	x3: %.64x
+	y3: %.64x
+`, i, x1, y1, expectedX1, expectedY1)
 		}
 	}
 }
