@@ -153,7 +153,7 @@ func AddJacobi(
 	return
 }
 
-// AddAffine adds two affine points together:
+// AddAffine adds two affine points on the secp256k1 curve:
 //
 //  P1 + P2 = P3
 //  (x1, y1) + (x2, y2) = (x3, y3)
@@ -232,4 +232,42 @@ func AddAffine(
 	modCoordinate(y3)
 
 	return
+}
+
+// SubJacobi subtracts two Jacobian coordinate points on the secp256k1 curve:
+//
+//  P1 - P2 = P3
+//  (x1, y1, z1) - (x2, y2, z2) = (x3, y3, z3)
+//
+// It returns the resulting Jacobian point (x3, y3, z3).
+//
+// This function does not check point validity - it assumes you
+// are passing valid points on the secp256k1 curve.
+func SubJacobi(
+	x1, y1, z1 *big.Int,
+	x2, y2, z2 *big.Int,
+) (x3, y3, z3 *big.Int) {
+	return AddJacobi(
+		x1, y1, z1,
+		x2, Negate(y2), z2,
+	)
+}
+
+// SubAffine subtracts two affine points on the secp256k1 curve:
+//
+//  P1 - P2 = P3
+//  (x1, y1) - (x2, y2) = (x3, y3)
+//
+// It returns the resulting affine point (x3, y3).
+//
+// This function does not check point validity - it assumes you
+// are passing valid points on the secp256k1 curve.
+func SubAffine(
+	x1, y1 *big.Int,
+	x2, y2 *big.Int,
+) (x3, y3 *big.Int) {
+	return AddAffine(
+		x1, y1,
+		x2, Negate(y2),
+	)
 }
