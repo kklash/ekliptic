@@ -1,5 +1,5 @@
-// genprecompute computes base-point doubles for the secp256k1 generator point,
-// and writes them as generated code to a given output file.
+// genprecompute precomputes a base-point table for the secp256k1 generator point,
+// and writes it as generated code to a given output file.
 package main
 
 import (
@@ -15,27 +15,33 @@ var (
 )
 
 func run() error {
-	flag.StringVar(&outputFilePath, "o", "", "output precomputed doubles code to this file")
+	flag.StringVar(&outputFilePath, "o", "", "output precomputed table code to this file")
 	flag.Parse()
 
-	doubles := ekliptic.ComputePointDoubles(
+	table := ekliptic.NewPrecomputedTable(
 		ekliptic.Secp256k1_GeneratorX,
 		ekliptic.Secp256k1_GeneratorY,
 	)
 
 	code := `package ekliptic
 
+import "math/big"
+
 // DO NOT EDIT!
 // This file was automatically generated.
 
 func init() {
-	basePointPrecomputations = PrecomputedDoubles{
+	basePointPrecomputations = PrecomputedTable{
 `
 
-	for _, double := range doubles {
+	for _, row := range table {
 		code += "\t\t{\n"
-		code += fmt.Sprintf("\t\t\thexint(\"%x\"),\n", double[0])
-		code += fmt.Sprintf("\t\t\thexint(\"%x\"),\n", double[1])
+		for _, point := range row {
+			code += "\t\t\t{\n"
+			code += fmt.Sprintf("\t\t\t\tnew(big.Int).SetBytes(%#v),\n", point[0].Bytes())
+			code += fmt.Sprintf("\t\t\t\tnew(big.Int).SetBytes(%#v),\n", point[1].Bytes())
+			code += "\t\t\t},\n"
+		}
 		code += "\t\t},\n"
 	}
 	code += "\t}\n"

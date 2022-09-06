@@ -4,11 +4,11 @@ import (
 	"math/big"
 )
 
-var basePointPrecomputations PrecomputedDoubles
+var basePointPrecomputations PrecomputedTable
 
 // MultiplyBasePoint multiplies the secp256k1 generator base point by the
-// given integer k, and returns the resulting affine point (x, y). This uses
-// precomputed doubles for the secp256k1 base point to speed up multiplications.
+// given integer k, and returns the resulting affine point (x, y). This uses a
+// precomputed table for the secp256k1 base point to speed up multiplications.
 //
 // This function is used to derive the public key for a private key k, among other uses.
 func MultiplyBasePoint(k *big.Int) (x, y *big.Int) {
