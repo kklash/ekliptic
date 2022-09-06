@@ -246,7 +246,7 @@ fmt.Println("found correct unblinded point q * h * G")
 | `go test` | Run unit tests. |
 | `go test -bench=.` | Run benchmarks. |
 | `go test -bench=. -benchmem` | Run benchmarks with memory profile. |
-| `go generate` | Regenerate [precomputed base point doubles](./precomputed_doubles.go). |
+| `go generate` | Regenerate [precomputed base point products](./precomputed_table.go). |
 
 ## Test Vectors
 
@@ -295,7 +295,16 @@ BenchmarkMultiplyAffineNaive-6                 442     2480711 ns/op    545915 B
 
 ### Precomputation
 
-You can improve multiplication performance even more by using precomputed doubles of the point being multiplied. For the heavily used basepoint $G$, precomputing $2^iG$ for $0 <= i <= 255$ significantly boosts performance for base-point [double-and-add multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Double-and-add), especially if [the precomputed doubles are saved in affine form](./precomputed_doubles.go). Values are computed using the `ekliptic.ComputePointDoubles` function, [triggered by `go generate`](./genprecompute).
+You can improve point multiplication performance significantly by precomputing a table of products of a point $P$ which you plan to multiply frequently. Precomputation means calculating $2^{4i}jP$ for $0 <= i <= 63$ and $0 <= j <= 15$. This table is indexable by $i$ and $j$. When using a precomputed table with a multiplication, `ekliptic` uses the [windowed method](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Windowed_method). This speeds up multiplication of a fixed point often by a factor of 5x-10x, and saves a lot of memory allocations.
+
+```
+BenchmarkMultiplyJacobi-6                      241     4859994 ns/op   1229138 B/op     9382 allocs/op
+BenchmarkMultiplyJacobi_Precomputed-6         2578      590604 ns/op    144339 B/op     1372 allocs/op
+```
+
+The secp256k1 base point $G$ is multiplied very frequently, so `ekliptic` [ships with a precomputed table for $G$ ready to go](./precomputed_table.go). This table is used to speed up `ekliptic.MultiplyBasePoint`. The source code file containing the table is auto-generated, [triggered by `go generate`](./genprecompute).
+
+Precomputed tables for custom points can be constructed using `ekliptic.NewPrecomputedTable` function.
 
 ### Other Performance Notes
 
