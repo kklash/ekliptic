@@ -14,26 +14,29 @@ func equal(v1, v2 *big.Int) bool {
 // without the performance penalty of actually converting both points to affine format.
 // It returns true if:
 //
-//  x2 * z1² == x1 * z2²
-//  y2 * z1³ == y1 * z2³
+//	x2 * z1² == x1 * z2²
+//	y2 * z1³ == y1 * z2³
 //
 // Affine coordinates are calculated as:
-//  Ax1 = x1 / z1²
-//  Ax2 = x2 / z2²
-//  Ay1 = y1 / z1³
-//  Ay2 = y2 / z2³
+//
+//	Ax1 = x1 / z1²
+//	Ax2 = x2 / z2²
+//	Ay1 = y1 / z1³
+//	Ay2 = y2 / z2³
 //
 // Thus, we can re-arrange operations to avoid costly division,
 // and determine if the x-coordinate matches:
-//  Ax1 = Ax2
-//  x2 / z2² = x1 / z1²
-//  (x2 * z1²) / z2² = x1
-//  x2 * z1² = x1 * z2²
+//
+//	Ax1 = Ax2
+//	x2 / z2² = x1 / z1²
+//	(x2 * z1²) / z2² = x1
+//	x2 * z1² = x1 * z2²
 //
 // Same for the y-coordinate:
-//  Ay1 = Ay2
-//  (y2 * z1³) / z2³ = y1
-//  y2 * z1³ = y1 * z2³
+//
+//	Ay1 = Ay2
+//	(y2 * z1³) / z2³ = y1
+//	y2 * z1³ = y1 * z2³
 //
 // This approach provides a 5x speedup compared to affine conversion.
 func EqualJacobi(

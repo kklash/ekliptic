@@ -6,8 +6,8 @@ import (
 
 // AddJacobi adds two Jacobian coordinate points on the secp256k1 curve:
 //
-//  P1 + P2 = P3
-//  (x1, y1, z1) + (x2, y2, z2) = (x3, y3, z3)
+//	P1 + P2 = P3
+//	(x1, y1, z1) + (x2, y2, z2) = (x3, y3, z3)
 //
 // It returns the resulting Jacobian point (x3, y3, z3).
 //
@@ -15,20 +15,20 @@ import (
 //
 // https://hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#addition-add-1998-cmo-2
 //
-//  Z1Z1 = Z1²
-//  Z2Z2 = Z2²
-//  U1 = X1*Z2Z2
-//  U2 = X2*Z1Z1
-//  S1 = Y1*Z2*Z2Z2
-//  S2 = Y2*Z1*Z1Z1
-//  H = U2-U1
-//  HH = H²
-//  HHH = H*HH
-//  r = S2-S1
-//  V = U1*HH
-//  X3 = r²-HHH-2*V
-//  Y3 = r*(V-X3)-S1*HHH
-//  Z3 = Z1*Z2*H
+//	Z1Z1 = Z1²
+//	Z2Z2 = Z2²
+//	U1 = X1*Z2Z2
+//	U2 = X2*Z1Z1
+//	S1 = Y1*Z2*Z2Z2
+//	S2 = Y2*Z1*Z1Z1
+//	H = U2-U1
+//	HH = H²
+//	HHH = H*HH
+//	r = S2-S1
+//	V = U1*HH
+//	X3 = r²-HHH-2*V
+//	Y3 = r*(V-X3)-S1*HHH
+//	Z3 = Z1*Z2*H
 //
 // This function does not check point validity - it assumes you
 // are passing valid points on the secp256k1 curve.
@@ -155,19 +155,19 @@ func AddJacobi(
 
 // AddAffine adds two affine points on the secp256k1 curve:
 //
-//  P1 + P2 = P3
-//  (x1, y1) + (x2, y2) = (x3, y3)
+//	P1 + P2 = P3
+//	(x1, y1) + (x2, y2) = (x3, y3)
 //
 // It returns the resulting affine point (x3, y3).
 //
 // We incorporate the standard affine addition and doubling formulas:
 //
-//  if P1 == P2:
-//   m = (3 * x1² + a) / (2 * y1)
-//  else:
-//   m = (y2 - y1) / (x2 - x1)
-//  x3 = m² - x1 - x2
-//  y3 = m * (x1 - x3) - y1
+//	if P1 == P2:
+//	 m = (3 * x1² + a) / (2 * y1)
+//	else:
+//	 m = (y2 - y1) / (x2 - x1)
+//	x3 = m² - x1 - x2
+//	y3 = m * (x1 - x3) - y1
 //
 // This function does not check point validity - it assumes you
 // are passing valid points on the secp256k1 curve.
@@ -236,8 +236,8 @@ func AddAffine(
 
 // SubJacobi subtracts two Jacobian coordinate points on the secp256k1 curve:
 //
-//  P1 - P2 = P3
-//  (x1, y1, z1) - (x2, y2, z2) = (x3, y3, z3)
+//	P1 - P2 = P3
+//	(x1, y1, z1) - (x2, y2, z2) = (x3, y3, z3)
 //
 // It returns the resulting Jacobian point (x3, y3, z3).
 //
@@ -255,8 +255,8 @@ func SubJacobi(
 
 // SubAffine subtracts two affine points on the secp256k1 curve:
 //
-//  P1 - P2 = P3
-//  (x1, y1) - (x2, y2) = (x3, y3)
+//	P1 - P2 = P3
+//	(x1, y1) - (x2, y2) = (x3, y3)
 //
 // It returns the resulting affine point (x3, y3).
 //

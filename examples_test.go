@@ -141,15 +141,18 @@ func ExampleCurve() {
 
 // InvertScalar is useful for reversibly blinding a value you don't want to reveal.
 // Alice can blind any point A with some random scalar s to produce a blinded point B:
-//  B = s * A
+//
+//	B = s * A
 //
 // B can then be blinded by another party Bob, with their own secret r:
-//  C = r * B
+//
+//	C = r * B
 //
 // Alice can then unblind C by inverting their secret s:
-//  M = s⁻¹ * C
-//  M = s⁻¹ * (r * s * A)
-//  M = r * A
+//
+//	M = s⁻¹ * C
+//	M = s⁻¹ * (r * s * A)
+//	M = r * A
 //
 // Alice now knows r * A without knowing r, having revealed neither A nor the final result M to Bob.
 func ExampleInvertScalar() {

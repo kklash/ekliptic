@@ -5,15 +5,16 @@ import "math/big"
 // DoubleJacobi doubles a Jacobian coordinate point on the secp256k1 curve, using the "dbl-2009-l" doubling formulas.
 //
 // http://hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#doubling-dbl-2009-l
-//  A = X1²
-//  B = Y1²
-//  C = B²
-//  D = 2*((X1+B)²-A-C)
-//  E = 3*A
-//  F = E²
-//  X3 = F-2*D
-//  Y3 = E*(D-X3)-8*C
-//  Z3 = 2*Y1*Z1
+//
+//	A = X1²
+//	B = Y1²
+//	C = B²
+//	D = 2*((X1+B)²-A-C)
+//	E = 3*A
+//	F = E²
+//	X3 = F-2*D
+//	Y3 = E*(D-X3)-8*C
+//	Z3 = 2*Y1*Z1
 func DoubleJacobi(x1, y1, z1 *big.Int) (x3, y3, z3 *big.Int) {
 	// a = x1²
 	a := new(big.Int).Mul(x1, x1)
@@ -71,9 +72,9 @@ func DoubleJacobi(x1, y1, z1 *big.Int) (x3, y3, z3 *big.Int) {
 	return
 }
 
-//  m = (3*x1²+a) / (2*y1)
-//  x3 = m² - x1 - x2
-//  y3 = m(x1-x3) - y1
+// m = (3*x1²+a) / (2*y1)
+// x3 = m² - x1 - x2
+// y3 = m(x1-x3) - y1
 func DoubleAffine(x1, y1 *big.Int) (x3, y3 *big.Int) {
 	return AddAffine(x1, y1, x1, y1)
 }

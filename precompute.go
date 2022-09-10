@@ -10,14 +10,14 @@ import "math/big"
 //
 // The table is laid out like this:
 //
-//        0 1 2 3 4 ... 15
-//  -----------------------
-//  2^0  |* * * * * ...  *
-//  2^4  |* * * * * ...  *
-//  2^8  |* * * * * ...  *
-//  2^16 |* * * * * ...  *
-//  ...  |* * * * * ...  *
-//  2^252|* * * * * ...  *
+//	      0 1 2 3 4 ... 15
+//	-----------------------
+//	2^0  |* * * * * ...  *
+//	2^4  |* * * * * ...  *
+//	2^8  |* * * * * ...  *
+//	2^16 |* * * * * ...  *
+//	...  |* * * * * ...  *
+//	2^252|* * * * * ...  *
 //
 // Each row i of the table holds the multiplications of the point, doubled 4i times.
 // i should be less than 64.
@@ -27,11 +27,11 @@ import "math/big"
 //
 // Indexing the table like so:
 //
-//  table[i][j]
+//	table[i][j]
 //
 // ...Looks up the following precomputed point multiplication:
 //
-//  2^(4i) * j * P
+//	2^(4i) * j * P
 type PrecomputedTable [][][2]*big.Int
 
 // NewPrecomputedTable computes a PrecomputedTable used for speeding up multiplications

@@ -4,8 +4,9 @@ import "math/big"
 
 // Jacobian coordinates are a three-dimensional representation of a 2d (affine) point, (Ax, Ay), in terms of three variables: (x, y, z)
 // such that:
-//  Ax = x / z²
-//  Ay = y / z³
+//
+//	Ax = x / z²
+//	Ay = y / z³
 //
 // ToAffine converts the given jacobian coordinates to affine coordinates,
 // normalizing x and y, and setting z = 1. This is an expensive operation,

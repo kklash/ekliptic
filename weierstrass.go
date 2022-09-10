@@ -6,7 +6,9 @@ import (
 
 // Weierstrass solves the Weierstrass form elliptic curve equation for y,
 // given an affine value of x:
-//  y² = x³ + ax + b mod P
+//
+//	y² = x³ + ax + b mod P
+//
 // ...where a = 0, b = 7 and P is Secp256k1_P - the secp256k1 curve constants.
 //
 // It returns the two possible values of y: an even value and an odd value. You could also
